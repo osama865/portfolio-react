@@ -18,14 +18,14 @@ function Intro() {
 
             <div id="navigation">
               <li>
-                <a href="https://medium.com/@osama1010">My Articles</a>
+                <a href="https://medium.com/@osama1010">My Blog</a>
               </li>
             </div>
           </div>
           <div className="left-column">
             <img
               id="profile_pic"
-              src="images/osama-animated.jpg"
+              src="assets/osama-animated.jpg"
               alt="profile pic"
             />
             <h5 className="TextToCenter">Personalize Theme</h5>
