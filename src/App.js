@@ -1,10 +1,18 @@
-import logo from './logo.svg';
-import './App.css';
+import About from './components/about';
+import Contact from './components/contact';
+import Intro from './components/intro';
+import Projects from './components/projects';
+import Social from './components/social';
 
 function App() {
   return (
     <div className="App">
-      <h1>My portfolio</h1>
+      <Intro />
+      <About />
+      <Social />
+      <Projects />
+      <Contact />
+      
     </div>
   );
 }
