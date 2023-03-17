@@ -16,8 +16,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "branchDelete" : "git branch --delete $M",
-    "commit" : "git commit -m '$M' ",
+    "delete-branch" : "git branch --delete ",
+    "new-branch":"git checkout -b",
+    "commit" : "git add . && git commit",
     "add":"git add ."
   },
   "eslintConfig": {
