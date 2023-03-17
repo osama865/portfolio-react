@@ -1,17 +1,10 @@
-import About from './components/about';
-import Contact from './components/contact';
-import Intro from './components/intro';
-import Projects from './components/projects';
-import Social from './components/social';
+import Blog from './pages/blog';
+import Portfolio from './pages/portfolio';
 
 function App() {
   return (
     <div className="App">
-      <Intro />
-      <About />
-      <Social />
-      <Projects />
-      <Contact />
+      <Portfolio />
       
     </div>
   );
