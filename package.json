@@ -18,7 +18,8 @@
     "eject": "react-scripts eject",
     "delete-branch" : "git branch --delete ",
     "new-branch":"git checkout -b",
-    "commit" : "git add . && git commit",
+    "commit" : "git add . && git commit -m $M",
+    "merge":"git checkout master && gite merge $B",
     "add":"git add ."
   },
   "eslintConfig": {
