@@ -1,27 +1,34 @@
-console.log("its working");
+console.log("Themes script");
 
-let theme = localStorage.getItem("theme");
+let currentTheme = localStorage.getItem("theme");
+console.log(currentTheme);
+
+function setTheme(theme) {
+  document.getElementById(`theme-style`).href = `css/${theme}.css`;
+  localStorage.setItem("theme", theme);
+}
 
 setTimeout(() => {
-  if (theme == null) {
-    setTheme("light");
-  } else {
-    setTheme(theme);
-  }
   let themeDots = document.getElementsByClassName("theme-dot");
 
-  console.log("is sthis working", themeDots);
+  if (themeDots.length != 0) {
+    if (currentTheme == null) {
+      setTheme("light");
+    } else {
+      setTheme(currentTheme);
+    }
 
-  for (var i = 0; themeDots.length > i; i++) {
-    themeDots[i].addEventListener("click", function () {
-      let mode = this.dataset.mode;
-      setTheme(mode);
-      console.log("Option clicked:", mode);
-    });
-  }
+    console.log("is sthis working", themeDots);
 
-  function setTheme(mode) {
-    document.getElementById(`theme-style`).href = `css/${mode}.css`;
-    localStorage.setItem("theme", mode);
+    for (var i = 0; themeDots.length > i; i++) {
+      themeDots[i].addEventListener("click", function () {
+        let mode = this.dataset.mode;
+        setTheme(mode);
+        console.log("Option clicked:", mode);
+      });
+    }
+  } else {
+    console.log("there is no themes, apply the current theme");
+    document.getElementById(`theme-style`).href = `css/${currentTheme}.css`;
   }
 }, 2000);
