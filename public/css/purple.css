@@ -14,3 +14,7 @@
 
   --btnColor: #8534a3;
 }
+
+body {
+  background-color: var(--mainColor);
+}

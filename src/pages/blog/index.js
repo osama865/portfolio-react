@@ -1,4 +1,5 @@
 import React from 'react';
+import Themes from '../../components/themes';
 
 function Blog() {
     return (
@@ -6,6 +7,8 @@ function Blog() {
             <h1>
                 Blog
             </h1>
+
+            <Themes />
         </div>
     );
 }

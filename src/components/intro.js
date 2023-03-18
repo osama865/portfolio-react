@@ -1,5 +1,6 @@
 // @flow
 import React from "react";
+import Themes from "./themes";
 
 function Intro() {
   return (
@@ -22,54 +23,7 @@ function Intro() {
               </li>
             </div>
           </div>
-          <div className="left-column">
-            <img
-              id="profile_pic"
-              src="assets/osama-animated.jpg"
-              alt="profile pic"
-            />
-            <h5 className="TextToCenter">Personalize Theme</h5>
-
-            <div id="theme-options-wrapper">
-              <div
-                data-mode="light"
-                id="light-mode"
-                className="theme-dot"
-                onClick={() => {
-                  console.log("light");
-                }}
-              ></div>
-              <div
-                data-mode="blue"
-                id="blue-mode"
-                className="theme-dot"
-                onClick={() => {
-                  console.log("blue");
-                }}
-              ></div>
-              <div
-                data-mode="green"
-                id="green-mode"
-                className="theme-dot"
-                onClick={() => {
-                  console.log("green");
-                }}
-              ></div>
-              <div
-                data-mode="purple"
-                id="purple-mode"
-                className="theme-dot"
-                onClick={() => {
-                  console.log("purple");
-                }}
-              ></div>
-            </div>
-
-            <p id="settings-note">
-              *Theme settings will be saved for <br />
-              your next visit
-            </p>
-          </div>
+          <Themes />
           <div className="right-column">
             <div id="preview-shadow">
               <div id="preview">
