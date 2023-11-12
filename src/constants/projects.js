@@ -20,7 +20,7 @@ const projetcs = [
     description:
       "Attractive Restaurant website with all pages that needed by your customers, menu, about, gallary and contact. So they can found everything about your restaurant.",
     image: "assets/restaurant.png",
-    liveLink: "https://o-restaurant.pages.dev",
+    liveLink: "https://assemble-res.pages.dev",
     SourceLink: "https://github.com/osama865/assemble-rest",
   },
   {
@@ -59,7 +59,7 @@ const projetcs = [
     name: "Galarey",
     description: "simple Galarey app to store your images there and share them",
     image: "assets/firegram.png",
-    liveLink: "https://0firegram.pages.dev",
+    liveLink: "https://galarey.pages.dev",
     SourceLink: "https://github.com/osama865/Galarey",
   },
   {
