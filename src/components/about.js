@@ -43,6 +43,7 @@ function About() {
                 <li>CMS Platforms Project Management Contentful</li>
                 <li>Teamwork and Collaboration</li>
                 <li>Databases: Firebase, MYSQL, MongoDB</li>
+                <li>AI & Machine Learning</li>
                 <li>Express.js</li>
                 <li>Meteor.js</li>
                 <li>Socket.io</li>
