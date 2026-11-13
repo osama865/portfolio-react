@@ -23,3 +23,12 @@ test("mobile navigation opens and reaches projects", async ({ page }, info) => {
   await page.getByRole("link", { name: "Projects", exact: true }).click();
   await expect(page).toHaveURL(/\/projects\/$/);
 });
+test("project archive filters by category and restores all projects", async ({ page }) => {
+  await page.goto("/projects/");
+  const total = await page.locator(".project-card:visible").count();
+  await page.getByRole("button", { name: "Website", exact: true }).click();
+  await expect(page.locator(".project-card:visible")).toHaveCount(2);
+  await expect(page.locator(".project-card:visible").first()).toHaveAttribute("data-category", "Website");
+  await page.getByRole("button", { name: "All", exact: true }).click();
+  await expect(page.locator(".project-card:visible")).toHaveCount(total);
+});

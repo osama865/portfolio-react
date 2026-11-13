@@ -6,7 +6,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "check": "astro check",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "preview": "astro preview"
   },
   "dependencies": {
     "astro": "^5.0.0"

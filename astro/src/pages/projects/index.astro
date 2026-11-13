@@ -2,8 +2,24 @@
 import SiteLayout from "../../layouts/SiteLayout.astro";
 import ProjectCard from "../../components/ProjectCard.astro";
 import { projects } from "../../data/projects";
+const categories = [...new Set(projects.map((project) => project.category))];
 ---
 <SiteLayout title="Projects — Osama Ibrahim" description="Software projects, product work and experiments by Osama Ibrahim.">
   <section class="page-hero"><div class="container"><small class="eyebrow">SELECTED WORK / PROJECT ARCHIVE</small><h1>A collection of things <em style="color:var(--blue);font-style:normal">I've built.</em></h1><p>Real projects, different stages, and lessons carried forward. Historical links are references, not proof that every deployment is currently online.</p><div class="case-meta"><span>{projects.length} PROJECTS</span><span>WEB · PRODUCT · EXPERIMENTS</span></div></div></section>
-  <section class="section"><div class="container project-grid all-projects">{projects.map((project)=><ProjectCard project={project}/>)}</div></section>
+  <section class="section"><div class="container">
+    <div class="project-filters" role="group" aria-label="Filter projects">
+      <button type="button" data-filter="all" aria-pressed="true">All</button>
+      {categories.map((category) => <button type="button" data-filter={category} aria-pressed="false">{category}</button>)}
+    </div>
+    <div class="project-grid all-projects">{projects.map((project)=><ProjectCard project={project}/>)}</div>
+  </div></section>
+  <script>
+    const filters = document.querySelectorAll<HTMLButtonElement>("[data-filter]");
+    const cards = document.querySelectorAll<HTMLElement>("[data-category]");
+    filters.forEach((button) => button.addEventListener("click", () => {
+      const selected = button.dataset.filter ?? "all";
+      cards.forEach((card) => { card.hidden = selected !== "all" && card.dataset.category !== selected; });
+      filters.forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+    }));
+  </script>
 </SiteLayout>
