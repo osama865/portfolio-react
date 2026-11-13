@@ -21,6 +21,15 @@ const links = [
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content={description} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Osama Ibrahim" />
+  <meta property="og:locale" content={locale === "ar" ? "ar_AR" : "en_US"} />
+  <meta property="og:locale:alternate" content={locale === "ar" ? "en_US" : "ar_AR"} />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
   <meta name="portfolio-build-commit" content={buildCommit} />
   <meta name="theme-color" content="#f5f7fb" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
