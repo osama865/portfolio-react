@@ -74,8 +74,8 @@ jobs:
               lastSeen = response.ok ? (match?.[1] ?? "commit marker missing") : `HTTP ${response.status}`;
               if (response.ok && match?.[1] === expected) {
                 const evidence = { url: origin, expectedCommit: expected, observedCommit: match[1], status: response.status, attempts: attempt, verifiedAt: new Date().toISOString() };
-                fs.writeFileSync("preview-readiness.json", JSON.stringify(evidence, null, 2) + "\\n");
-                fs.appendFileSync(process.env.GITHUB_OUTPUT, `url=${origin}\\ncommit=${expected}\\nattempts=${attempt}\\n`);
+                fs.writeFileSync("preview-readiness.json", JSON.stringify(evidence, null, 2) + "\n");
+                fs.appendFileSync(process.env.GITHUB_OUTPUT, `url=${origin}\ncommit=${expected}\nattempts=${attempt}\n`);
                 console.log("Preview serves the expected commit:", JSON.stringify(evidence));
                 process.exit(0);
               }
