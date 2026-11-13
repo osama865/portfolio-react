@@ -1,0 +1,31 @@
+name: Astro portfolio checks
+
+on:
+  push:
+    branches: ["phase-1/astro-foundation"]
+    paths: ["astro/**", ".github/workflows/portfolio-checks.yml"]
+  pull_request:
+    branches: [master]
+    paths: ["astro/**", ".github/workflows/portfolio-checks.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: astro
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install
+      - name: Astro and TypeScript diagnostics
+        run: npm run check
+      - name: Production build
+        run: npm run build
