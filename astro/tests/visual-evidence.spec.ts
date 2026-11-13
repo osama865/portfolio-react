@@ -39,6 +39,8 @@ test("dark theme keeps text and surfaces distinct", async ({ page }) => {
     color: getComputedStyle(element).color
   }));
   await page.getByRole("button", { name: "Toggle light and dark theme" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect.poll(() => page.locator("body").evaluate((element) => getComputedStyle(element).backgroundColor)).not.toBe(light.background);
   const dark = await page.locator("body").evaluate((element) => ({
     background: getComputedStyle(element).backgroundColor,
     color: getComputedStyle(element).color
