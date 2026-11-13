@@ -23,18 +23,16 @@ export const routePairs: Record<string, string> = {
   "/contact/": "/ar/contact/", "/writing/": "/ar/writing/",
 };
 
-export function counterpart(pathname: string, locale: Locale): string {
-  if (locale === "ar") {
-    const english = Object.entries(routePairs).find(([, arabic]) => arabic === pathname)?.[0];
-    if (english) return english;
-    const projectPrefix = "/ar/projects/";
-    if (pathname.startsWith(projectPrefix) && pathname.endsWith("/")) return pathname.slice(3);
-    const writingPrefix = "/ar/writing/";
-    if (pathname.startsWith(writingPrefix) && pathname.endsWith("/")) return pathname.slice(3);
-    return "/";
+export function counterpart(pathname: string): string {
+  // Resolve from the current route, not from the destination locale.
+  // The same path segments identify matching project and writing entries.
+  if (pathname === "/ar" || pathname.startsWith("/ar/")) {
+    const englishPath = pathname.slice(3);
+    return englishPath || "/";
   }
   if (routePairs[pathname]) return routePairs[pathname];
-  if (pathname.startsWith("/projects/") && pathname.endsWith("/")) return `/ar${pathname}`;
-  if (pathname.startsWith("/writing/") && pathname.endsWith("/")) return `/ar${pathname}`;
+  if ((pathname.startsWith("/projects/") || pathname.startsWith("/writing/")) && pathname.endsWith("/")) {
+    return `/ar${pathname}`;
+  }
   return "/ar/";
 }
