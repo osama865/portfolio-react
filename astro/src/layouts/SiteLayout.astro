@@ -6,6 +6,9 @@ const pathname = Astro.url.pathname;
 const locale: Locale = pathname === "/ar" || pathname.startsWith("/ar/") ? "ar" : "en";
 const t = messages[locale];
 const buildCommit = process.env.CF_PAGES_COMMIT_SHA ?? process.env.GITHUB_SHA ?? "local";
+const canonicalBase = Astro.site;
+const englishUrl = canonicalBase ? new URL(locale === "en" ? pathname : counterpart(pathname), canonicalBase).href : undefined;
+const arabicUrl = canonicalBase ? new URL(locale === "ar" ? pathname : counterpart(pathname), canonicalBase).href : undefined;
 const links = [
   [t.nav.home, locale === "ar" ? "/ar/" : "/"],
   [t.nav.work, locale === "ar" ? "/ar/projects/" : "/projects/"],
@@ -30,6 +33,13 @@ const links = [
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content={title} />
   <meta name="twitter:description" content={description} />
+  {canonicalBase && <>
+    <link rel="canonical" href={locale === "ar" ? arabicUrl : englishUrl} />
+    <link rel="alternate" hreflang="en" href={englishUrl} />
+    <link rel="alternate" hreflang="ar" href={arabicUrl} />
+    <link rel="alternate" hreflang="x-default" href={englishUrl} />
+    <meta property="og:url" content={locale === "ar" ? arabicUrl : englishUrl} />
+  </>}
   <meta name="portfolio-build-commit" content={buildCommit} />
   <meta name="theme-color" content="#f5f7fb" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
