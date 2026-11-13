@@ -1,5 +1,4 @@
 name: Astro portfolio checks
-
 on:
   push:
     branches: ["phase-1/astro-foundation"]
@@ -8,10 +7,8 @@ on:
     branches: [master]
     paths: ["astro/**", ".github/workflows/portfolio-checks.yml"]
   workflow_dispatch:
-
 permissions:
   contents: read
-
 jobs:
   verify:
     runs-on: ubuntu-latest
@@ -29,3 +26,16 @@ jobs:
         run: npm run check
       - name: Production build
         run: npm run build
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Browser tests and responsive screenshots
+        run: npm run test:e2e
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: portfolio-browser-evidence
+          path: |
+            astro/test-results/
+            astro/playwright-report/
+          if-no-files-found: ignore
