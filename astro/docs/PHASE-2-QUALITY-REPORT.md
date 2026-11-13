@@ -68,7 +68,7 @@ Changes added after baseline commit 9413757:
 
 Automated regression coverage has been added in `astro/tests/locale-theme.spec.ts` for locale semantics, route switching, case-study identity, archive count/filtering, theme state/persistence, reduced-motion preference, unsupported API fallback, image loading and mobile overflow. The existing theme test was updated for the accessible action label.
 
-**Important:** These later changes have not yet been accepted by CI at the time this report was updated. No pass count, visual acceptance, Arabic fluency acceptance or theme acceptance is claimed for them until a CI run on the resulting head completes and its artifact is inspected. The Arabic copy still requires an independent fluent-language review.
+**Current CI record:** Run [43494170184](https://github.com/osama865/portfolio-react/actions/runs/43494170184) on `307323d93fed912a9751bb306b36bc85737bd7f7` passed clean install, dependency audit, diagnostics, production build and Chromium installation, but was cancelled during the expanded Playwright step when a newer commit superseded it; no browser totals were produced. Run [43494689474](https://github.com/osama865/portfolio-react/actions/runs/43494689474) on `3f12b25f62633f14752c70e451d59f990aa2a489` passed clean install, dependency manifest check, audit, diagnostics and production build; Chromium installation was still in progress at the time of this report update. No Playwright totals or browser acceptance are claimed yet. The report-only commit now at the branch head requires its own exact-head CI run. The Arabic copy still requires an independent fluent-language review.
 
 ## Outstanding quality checks
 
