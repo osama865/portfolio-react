@@ -112,6 +112,8 @@ test("axe accessibility smoke scan covers representative English and Arabic rout
     ["/ar/writing/choose-node-framework/", "ar-writing-entry"]
   ] as const;
   const reports: Array<{ route: string; theme: string; violations: unknown[]; incomplete: unknown[] }> = [];
+  // Stabilise computed colors before axe reads them; theme transitions remain covered by the interaction tests.
+  await page.emulateMedia({ reducedMotion: "reduce" });
 
   for (const [path, name] of routes) {
     await page.goto(route(path));
