@@ -1,4 +1,6 @@
 import { test, expect } from "@playwright/test";
+import { projects } from "../src/data/projects";
+import { writing } from "../src/data/writing";
 import { mkdirSync, writeFileSync } from "node:fs";
 
 const previewUrl = process.env.DEPLOYED_PREVIEW_URL;
@@ -15,6 +17,66 @@ test("deployed Astro preview serves the exact verified commit", async ({ page })
   if (expectedCommit) {
     await expect(page.locator("meta[name='portfolio-build-commit']")).toHaveAttribute("content", expectedCommit);
     await expect(page.locator("html")).toHaveAttribute("data-build-commit", expectedCommit);
+  }
+});
+
+
+test("every deployed locale route is usable at mobile, tablet and desktop widths", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop-chromium", "The deployed viewport matrix runs once in desktop Chromium; a separate mobile project covers real mobile emulation.");
+  test.setTimeout(240_000);
+
+  const paired = [
+    ["/", "/ar/"],
+    ["/projects/", "/ar/projects/"],
+    ["/writing/", "/ar/writing/"],
+    ["/about/", "/ar/about/"],
+    ["/approach/", "/ar/approach/"],
+    ["/contact/", "/ar/contact/"],
+    ...projects.map(({ slug }) => [`/projects/${slug}/`, `/ar/projects/${slug}/`]),
+    ...writing.map(({ slug }) => [`/writing/${slug}/`, `/ar/writing/${slug}/`])
+  ];
+  const routes = paired.flatMap(([english, arabic]) => [english, arabic]);
+  const viewports = [
+    { name: "mobile", width: 360, height: 800 },
+    { name: "tablet", width: 768, height: 1024 },
+    { name: "desktop", width: 1440, height: 900 }
+  ];
+
+  for (const viewport of viewports) {
+    await page.setViewportSize({ width: viewport.width, height: viewport.height });
+    for (const path of routes) {
+      await page.goto(route(path), { waitUntil: "domcontentloaded" });
+      const locale = path.startsWith("/ar/") ? "ar" : "en";
+      await expect(page.locator("html")).toHaveAttribute("lang", locale);
+      await expect(page.locator("html")).toHaveAttribute("dir", locale === "ar" ? "rtl" : "ltr");
+      await expect(page.locator("main h1").first()).toBeVisible();
+      await expect(page.locator("meta[name='description']")).toHaveAttribute("content", /.+/);
+      await expect(page).toHaveTitle(/.+/);
+
+      const dimensions = await page.evaluate(() => ({
+        scrollWidth: document.documentElement.scrollWidth,
+        clientWidth: document.documentElement.clientWidth
+      }));
+      expect(
+        dimensions.scrollWidth,
+        `${viewport.name} horizontal overflow on ${path}: ${JSON.stringify(dimensions)}`
+      ).toBeLessThanOrEqual(dimensions.clientWidth + 1);
+
+      const expectedCounterpart = path.startsWith("/ar/") ? path.slice(3) || "/" : `/ar${path}`;
+      await expect(page.locator("a.language-switch")).toHaveAttribute("href", expectedCounterpart);
+      console.log(`DEPLOYED ROUTE PASS [${viewport.name}] ${path}`);
+    }
+  }
+
+  // Check both portrait and landscape orientation changes on the homepage.
+  for (const size of [{ width: 390, height: 844 }, { width: 844, height: 390 }]) {
+    await page.setViewportSize(size);
+    await page.goto(route("/ar/"));
+    const dimensions = await page.evaluate(() => ({
+      scrollWidth: document.documentElement.scrollWidth,
+      clientWidth: document.documentElement.clientWidth
+    }));
+    expect(dimensions.scrollWidth, `orientation overflow at ${size.width}x${size.height}`).toBeLessThanOrEqual(dimensions.clientWidth + 1);
   }
 });
 
