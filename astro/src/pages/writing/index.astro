@@ -1,0 +1,26 @@
+---
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import { writing, writingCategories } from "../../data/writing";
+---
+<SiteLayout title="Writing — Osama Ibrahim" description="Technical notes, project write-ups and occasional reflections by Osama Ibrahim.">
+  <section class="page-hero writing-hero"><div class="container"><small class="eyebrow">NOTES, EXPLANATIONS & OCCASIONAL DETOURS</small><h1>Some ideas deserve<br/>a little <em>more room.</em></h1><p>A collection of things I've written while learning, building, comparing tools, and trying to explain what I found useful.</p><div class="case-meta"><span>{writing.length} PUBLISHED PIECES</span><span>2022—2022 / ARCHIVE</span></div></div></section>
+  <section class="section writing-section"><div class="container">
+    <div class="writing-intro"><small class="eyebrow">THE NOTEBOOK</small><p>These are original publications, not a live social feed. Where the same piece appeared on both Medium and DEV, one canonical version is featured and the alternate is linked from its entry.</p></div>
+    <div class="writing-filters" role="group" aria-label="Filter writing by subject"><button type="button" data-writing-filter="all" aria-pressed="true">All writing</button>{writingCategories.map((category)=><button type="button" data-writing-filter={category} aria-pressed="false">{category}</button>)}</div>
+    <div class="writing-list">{writing.map((item,index)=><article class="writing-entry" data-writing-category={item.category} data-reveal>
+      <span class="writing-index">{String(index+1).padStart(2,"0")}</span>
+      <div class="writing-main"><div class="writing-meta"><time datetime={item.dateISO}>{item.date}</time><span>{item.platform}</span><span>{item.category}</span></div><h2><a href={`/writing/${item.slug}/`}>{item.title}</a></h2><p>{item.summary}</p><div class="writing-tags">{item.tags.map(tag=><span>{tag}</span>)}</div></div>
+      <a class="writing-arrow" href={`/writing/${item.slug}/`} aria-label={`Read notes on ${item.title}`}>↗</a>
+    </article>)}</div>
+    <p class="writing-footnote">An archive, not a claim to have said the last word. Some of these pieces are early technical writing; the questions are still worth revisiting.</p>
+  </div></section>
+  <script>
+    const writingButtons = document.querySelectorAll<HTMLButtonElement>("[data-writing-filter]");
+    const writingEntries = document.querySelectorAll<HTMLElement>("[data-writing-category]");
+    writingButtons.forEach((button) => button.addEventListener("click", () => {
+      const category = button.dataset.writingFilter ?? "all";
+      writingEntries.forEach((entry) => { entry.hidden = category !== "all" && entry.dataset.writingCategory !== category; });
+      writingButtons.forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+    }));
+  </script>
+</SiteLayout>

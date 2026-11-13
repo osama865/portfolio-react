@@ -1,0 +1,24 @@
+---
+import SiteLayout from "../layouts/SiteLayout.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import { featuredProjects } from "../data/projects";
+import { writing } from "../data/writing";
+const featuredWriting = writing.slice(0, 3);
+---
+<SiteLayout title="Osama Ibrahim — A developer, a dreamer, and ever so often, a human." description="The work, writing and occasional side thoughts of Osama Ibrahim — developer and writer.">
+<section class="hero editorial-hero"><div class="container">
+  <div class="hero-topline"><small class="eyebrow" data-reveal>INDEPENDENT DEVELOPER · WRITER · ALWAYS LEARNING</small><span class="hero-coordinate">KHARTOUM / ONLINE</span></div>
+  <div class="editorial-hero-grid">
+    <div class="hero-copy"><h1 class="hero-quote" data-reveal><span>A developer,</span><span>a dreamer,</span><span>and ever so often,</span><em>a human.</em></h1>
+      <div class="hero-intro" data-reveal><p>I'm Osama Ibrahim — a full-stack developer who writes about the technologies, decisions, and projects I work with.</p><div class="hero-actions"><a class="button primary" href="/projects/">Explore the work ↗</a><a class="button secondary" href="/writing/">Read the writing →</a></div></div>
+    </div>
+    <aside class="hero-aside" data-reveal><span class="margin-mark">[ 01 — 03 ]</span><div class="aside-rule"></div><p>Currently interested in the space between a good question and a useful thing.</p><span class="aside-foot">SCROLL A LITTLE ↓</span></aside>
+  </div>
+  <div class="hero-bottom"><span>SOFTWARE / WORDS / OTHER CURIOSITIES</span><span>EST. THROUGH ITERATION</span></div>
+</div></section>
+<section class="intro-band"><div class="container intro-grid"><small class="eyebrow">A WORKING NOTE</small><p>I build web applications, explore how systems fit together, and write down what I learn along the way. The projects are the evidence; the notes are some of the thinking in between.</p><a class="circle-link" href="/about/" aria-label="About Osama">↗</a></div></section>
+<section class="section"><div class="container"><div class="section-heading" data-reveal><div><small class="eyebrow">01 / WORK</small><h2>Things made to be <em>useful.</em></h2></div><a class="read-link" href="/projects/">Explore all projects ↗</a></div><div class="project-grid">{featuredProjects.map((project)=><ProjectCard project={project}/>)}</div></div></section>
+<section class="writing-feature"><div class="container"><div class="writing-feature-head" data-reveal><div><small class="eyebrow">02 / WRITING</small><h2>Notes from the <em>process.</em></h2><p>Technical explanations, project notes, and the occasional question that refuses to stay technical.</p></div><a class="read-link" href="/writing/">Browse the notebook ↗</a></div><div class="home-writing-list">{featuredWriting.map((item,index)=><a class="home-writing" href={`/writing/${item.slug}/`} data-reveal><span>{String(index+1).padStart(2,"0")}</span><div><small>{item.date} · {item.platform}</small><h3>{item.title}</h3></div><b>↗</b></a>)}</div></div></section>
+<section class="statement human-note"><div class="container"><small class="eyebrow">03 / A SMALL REMINDER</small><h2>There is usually another way to look at a problem. <em>Sometimes another way to live with it, too.</em></h2><a class="button light" href="/about/">A little more context ↗</a><b class="giant-mark">OI.</b></div></section>
+<section class="section"><div class="container contact-cta"><div><small class="eyebrow">SOMETHING ON YOUR MIND?</small><h2>Let's start with a <em>conversation.</em></h2></div><a class="button primary" href="/contact/">Get in touch ↗</a></div></section>
+</SiteLayout>

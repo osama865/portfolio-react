@@ -1,0 +1,9 @@
+---
+import type { Project } from "../data/projects";
+interface Props { project: Project; }
+const { project }: Props = Astro.props;
+---
+<article class="project-card" data-category={project.category}>
+  <a class="project-cover" href={`/projects/${project.slug}/`}><img src={project.image} alt={`${project.name} project preview`} loading="lazy" /><span class:list={["status", project.status.startsWith("In development") ? "status-active" : project.status.includes("recovery") ? "status-recovery" : ""]}>{project.status}</span></a>
+  <div class="project-body"><small class="eyebrow">{project.category}</small><h3><a href={`/projects/${project.slug}/`}>{project.name}</a></h3><p>{project.description}</p><div class="tags">{project.stack.slice(0,3).map((tag: string) => <span>{tag}</span>)}</div><a class="read-link" href={`/projects/${project.slug}/`}>Explore project ↗</a></div>
+</article>
