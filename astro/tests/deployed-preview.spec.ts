@@ -73,7 +73,7 @@ test("capture deployed preview visual evidence", async ({ page }, info) => {
   const device = info.project.name.startsWith("mobile") ? "mobile" : "desktop";
   const capture = async (name: string) => {
     await page.evaluate(() => document.fonts.ready);
-    await page.screenshot({ path: `test-results/evidence/deployed-${device}-${name}.png`, fullPage: true });
+    await page.screenshot({ path: `visual-evidence/deployed-${device}-${name}.png`, fullPage: true });
   };
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto(origin);
