@@ -3,30 +3,13 @@
 **Audit date:** 13 November 2026  
 **Application:** `astro/`  
 **Node:** 22  
-**Audit command:** `npm audit --json`  
-**Result:** <strong>0 vulnerabilities</strong> (0 low, 0 moderate, 0 high, 0 critical)
+**Audit command:** `npm audit --json`
 
-## Initial findings
+## Initial findings and remediation
 
-The first audit of the original Astro 5 dependency range found five vulnerabilities:
+The first audit of the original Astro 5 dependency range found five vulnerabilities (1 low, 3 high, 1 critical). The affected dependency paths included Astro, esbuild, sharp, zod and zod-to-ts.
 
-- 1 low
-- 3 high
-- 1 critical
-
-The affected dependency paths were:
-
-- `astro` (direct; critical)
-- `esbuild` (transitive; low)
-- `sharp` (transitive; high)
-- `zod` (transitive; high)
-- `zod-to-ts` (transitive; high)
-
-The available remediation reported by npm required Astro 7.4.11. A blanket `npm audit fix --force` was not used.
-
-## Remediation
-
-Astro was deliberately upgraded to **7.4.11**. The app is a static Astro site without a server adapter or React runtime; the updated version passed Astro diagnostics, static build and the full browser test suite.
+The remediation was a deliberate upgrade to **Astro 7.4.11**; a blanket `npm audit fix --force` was not used. The app is a static Astro site without a server adapter or React runtime.
 
 All direct dependencies are pinned to exact versions in `astro/package.json`, and `astro/package-lock.json` is committed (lockfile version 3):
 
@@ -38,21 +21,22 @@ All direct dependencies are pinned to exact versions in `astro/package.json`, an
 | typescript | 5.9.3 |
 | @types/node | 22.20.5 |
 
-The CI pipeline now performs a clean `npm ci`, runs `npm audit`, and fails the job if any vulnerability remains. It does not suppress audit failures.
+## CI verification contract
 
-## Verification evidence
+The workflow now:
+- Runs `npm ci` directly against the committed manifest and lockfile.
+- Does not run `npm install`, regenerate the lockfile, rewrite dependency versions, commit, or push dependency changes.
+- Uses `contents: read` permissions.
+- Checks that `package.json` and `package-lock.json` remain unchanged after installation and after the test suite.
+- Runs `npm audit` against the installed dependency tree and fails the job on any reported vulnerability.
+- Runs Astro/TypeScript diagnostics, the production build and the Playwright suite.
 
-- Clean install: passed.
-- npm audit: 0 vulnerabilities across all severities.
-- Astro / TypeScript diagnostics: passed.
-- Static production build: passed; 18 pages generated.
-- Playwright: 43 passed, 1 intentionally skipped.
-- The route suite checks all 18 generated routes in desktop and mobile Chromium, including page titles, primary navigation presence, image decoding and horizontal overflow.
-- Existing interaction checks cover theme switching, mobile navigation and project-category filtering.
+## Verification status
 
-Successful CI run: https://github.com/osama865/portfolio-react/actions/runs/43428243496  
-Browser and audit artifact: https://github.com/osama865/portfolio-react/actions/runs/43428243496/artifacts/14037433340
+**The corrected workflow has been committed, but its new CI run is the required evidence for this audit.** Earlier successful workflow runs are not accepted as reproducibility evidence because the previous workflow modified dependency files before running `npm ci`. Their audit counts and test results are historical only; they do not establish that the exact committed manifest and lockfile were tested unchanged.
 
-## Residual risk / notes
+The final evidence record will be updated with the single successful run URL, its exact tested commit SHA and its artifact after that corrected run completes.
 
-No npm audit findings remain in the audited dependency tree. This does not constitute a general security guarantee for the application or the historical projects it links to. Re-run the audit on dependency changes and before production release.
+## Scope and residual risk
+
+A zero-finding `npm audit` result will describe only the dependency tree installed from this committed lockfile at the time of the run. It is not a general security guarantee for the application or the historical projects it links to. Re-run the audit on dependency changes and before production release.
