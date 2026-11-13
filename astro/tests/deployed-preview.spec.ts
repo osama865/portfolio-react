@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { mkdirSync, writeFileSync } from "node:fs";
 
 const previewUrl = process.env.DEPLOYED_PREVIEW_URL;
 const expectedCommit = process.env.EXPECTED_DEPLOYED_COMMIT;
@@ -92,4 +93,51 @@ test("capture English and Arabic visual matrix on deployed preview", async ({ pa
     await expect(menu).toHaveAttribute("aria-expanded", "true");
     await capture("mobile-navigation-open");
   }
+});
+
+test("axe accessibility smoke scan covers representative English and Arabic routes", async ({ page }, info) => {
+  const device = info.project.name.startsWith("mobile") ? "mobile" : "desktop";
+  const routes = [
+    ["/", "en-home"],
+    ["/ar/", "ar-home"],
+    ["/projects/", "en-project-archive"],
+    ["/ar/projects/", "ar-project-archive"],
+    ["/projects/injaz/", "en-injaz"],
+    ["/ar/projects/injaz/", "ar-injaz"],
+    ["/projects/life-advise/", "en-life-advise"],
+    ["/ar/projects/life-advise/", "ar-life-advise"],
+    ["/writing/", "en-writing"],
+    ["/ar/writing/", "ar-writing"],
+    ["/writing/choose-node-framework/", "en-writing-entry"],
+    ["/ar/writing/choose-node-framework/", "ar-writing-entry"]
+  ] as const;
+  const reports: Array<{ route: string; violations: Array<{ id: string; impact: string | null; description: string; nodes: number }> }> = [];
+
+  for (const [path, name] of routes) {
+    await page.goto(route(path));
+    await page.addScriptTag({ url: "https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js" });
+    const result = await page.evaluate(async () => {
+      const axe = (window as any).axe;
+      return axe.run(document, {
+        runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] }
+      });
+    });
+    reports.push({
+      route: path,
+      violations: result.violations.map((violation: any) => ({
+        id: violation.id,
+        impact: violation.impact ?? null,
+        description: violation.description,
+        nodes: violation.nodes.length
+      }))
+    });
+    console.log(`AXE ${device} ${name}: ${result.violations.length} violations`);
+  }
+
+  mkdirSync("test-results", { recursive: true });
+  writeFileSync(`test-results/axe-${device}-report.json`, JSON.stringify(reports, null, 2));
+  const serious = reports.flatMap(report => report.violations
+    .filter(violation => violation.impact === "serious" || violation.impact === "critical")
+    .map(violation => ({ route: report.route, ...violation })));
+  expect(serious, JSON.stringify(serious, null, 2)).toEqual([]);
 });
