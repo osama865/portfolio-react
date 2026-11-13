@@ -1,10 +1,10 @@
 name: Astro portfolio checks
 on:
   push:
-    branches: ["phase-1/astro-foundation"]
+    branches: ["phase-1/astro-foundation", "phase-2/evidence-backed-case-studies"]
     paths: ["astro/**", ".github/workflows/portfolio-checks.yml"]
   pull_request:
-    branches: [master]
+    branches: [master, "phase-1/astro-foundation"]
     paths: ["astro/**", ".github/workflows/portfolio-checks.yml"]
   workflow_dispatch:
 permissions:
@@ -53,6 +53,7 @@ jobs:
       - name: Browser tests and responsive screenshots
         run: npm run test:e2e
       - name: Wait for the exact commit on the isolated Cloudflare preview
+        if: github.event_name != 'pull_request' || github.event.pull_request.base.ref == 'master'
         id: preview
         env:
           EXPECTED_PREVIEW_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -94,6 +95,7 @@ jobs:
           process.exit(1);
           NODE
       - name: Verify theme interactions and visual evidence on deployed preview
+        if: github.event_name != 'pull_request' || github.event.pull_request.base.ref == 'master'
         env:
           DEPLOYED_PREVIEW_URL: ${{ steps.preview.outputs.url }}
           EXPECTED_DEPLOYED_COMMIT: ${{ steps.preview.outputs.commit }}
