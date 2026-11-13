@@ -18,8 +18,9 @@ const { title = "Osama Ibrahim — Full-stack developer", description = "I build
 <body>
   <header class="site-header"><div class="container nav-wrap">
     <a class="brand" href="/"><b>OI<span>.</span></b><small>OSAMA IBRAHIM</small></a>
+    <nav data-nav aria-label="Main navigation"><a href="/">Home</a><a href="/projects/">Projects</a><a href="/about/">About</a><a href="/approach/">How I work</a><a href="/contact/">Contact</a></nav>
+    <button class="theme-button" data-theme aria-label="Toggle light and dark theme">◐</button>
     <button class="menu-button" aria-label="Toggle navigation" aria-expanded="false" data-menu>☰</button>
-    <nav data-nav aria-label="Main navigation"><a href="/">Home</a><a href="/projects/">Projects</a><a href="/about/">About</a><a href="/approach/">How I work</a><a href="/contact/">Contact</a><button class="theme-button" data-theme aria-label="Toggle light and dark theme">◐</button></nav>
   </div></header>
   <main id="main"><slot /></main>
   <footer class="site-footer"><div class="container footer-wrap"><a class="brand" href="/"><b>OI<span>.</span></b></a><p>Designed with intent. Built with care.</p><div><a href="https://github.com/osama865" target="_blank" rel="noreferrer">GitHub ↗</a><a href="https://medium.com/@osama1010" target="_blank" rel="noreferrer">Medium ↗</a></div><small>© {new Date().getFullYear()} Osama Ibrahim</small></div></footer>
