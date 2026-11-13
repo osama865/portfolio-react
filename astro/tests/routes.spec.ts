@@ -27,7 +27,7 @@ for (const route of routes) {
     expect(response?.status(), `${route.path} should return HTTP 200`).toBe(200);
     await expect(page).toHaveTitle(route.title);
     await expect(page.locator("main h1").first()).toBeVisible();
-    await expect(page.getByRole("navigation", { name: "Main navigation" })).toBeAttached();
+    await expect(page.locator("nav[data-nav]")).toBeAttached();
     const brokenImages = await page.locator("img").evaluateAll((images) =>
       images.filter((image) => {
         const img = image as HTMLImageElement;
