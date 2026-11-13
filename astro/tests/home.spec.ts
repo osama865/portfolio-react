@@ -15,7 +15,8 @@ test("theme toggle changes the document theme", async ({ page }) => {
   await page.getByRole("button", { name: "Toggle light and dark theme" }).click();
   await expect(page.locator("html")).not.toHaveAttribute("data-theme", before ?? "light");
 });
-test("mobile navigation opens and reaches projects", async ({ page }) => {
+test("mobile navigation opens and reaches projects", async ({ page }, info) => {
+  test.skip(!info.project.name.startsWith("mobile"), "navigation drawer is specific to the mobile layout");
   await page.goto("/");
   await page.getByRole("button", { name: "Toggle navigation" }).click();
   await expect(page.getByRole("navigation")).toBeVisible();
