@@ -43,9 +43,8 @@ jobs:
       - name: Reproducible clean install
         run: npm ci
       - name: Dependency security audit
-        continue-on-error: true
         run: |
-          npm audit --json > npm-audit.json || true
+          npm audit --json > npm-audit.json || AUDIT_STATUS=$?
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
           const audit = JSON.parse(fs.readFileSync('npm-audit.json', 'utf8'));
@@ -54,6 +53,10 @@ jobs:
             console.log(JSON.stringify({ name, severity: item.severity, direct: item.isDirect, range: item.range, fixAvailable: item.fixAvailable, via: item.via.map(v => typeof v === 'string' ? v : { name: v.name, title: v.title, range: v.range, url: v.url }) }));
           }
           NODE
+          if [ "${AUDIT_STATUS:-0}" -ne 0 ]; then
+            echo "npm audit reported dependency vulnerabilities; review npm-audit.json."
+            exit "${AUDIT_STATUS}"
+          fi
       - name: Astro and TypeScript diagnostics
         run: npm run check
       - name: Production build

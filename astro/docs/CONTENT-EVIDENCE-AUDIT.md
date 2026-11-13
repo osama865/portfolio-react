@@ -45,3 +45,8 @@
 2. Re-check all historical demo destinations from a normal browser and confirm their ownership/content before any is promoted as a live demo.
 3. Obtain a correctly isolated Astro preview from a separate Cloudflare Pages project named `osama-portfolio-preview`, with root directory `astro`, build command `npm run build`, output directory `dist`, Node 22 and branch `phase-1/astro-foundation`.
 4. Verify the existing `o-portfolio` Cloudflare production branch and deployment history in Cloudflare itself; GitHub branch state alone cannot prove the Pages project setting.
+
+
+## Astro build isolation correction
+
+The first CI browser run exposed that the Astro config pointed `publicDir` at the legacy React app's root `public/` directory. That directory contains the old Create React App `index.html`, which was copied into Astro's output and overwrote the generated Astro homepage. The Astro app now uses its own `astro/public/` directory, populated with copies of the 29 required legacy assets (28 files under `public/assets/` plus the favicon). The original root `public/` directory remains unchanged. A fresh production-preview browser run is required to confirm that the served homepage is now the Astro version.
