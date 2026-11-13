@@ -28,7 +28,7 @@ test("language switch preserves homepage, project and article identity", async (
   await page.goto("/projects/injaz/");
   await page.getByRole("link", { name: "العربية" }).click();
   await expect(page).toHaveURL(/\/ar\/projects\/injaz\/$/);
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("إنجاز");
+  await expect(page).toHaveTitle(/إنجاز/);
   await page.getByRole("link", { name: "English" }).click();
   await expect(page).toHaveURL(/\/projects\/injaz\/$/);
 });
@@ -57,8 +57,9 @@ test("Arabic archive retains all project records and filter interaction", async 
 
 test("theme control exposes the action icon and synchronized state in both locales", async ({ page }) => {
   for (const route of ["/", "/ar/"]) {
-    await page.evaluate(() => localStorage.removeItem("portfolio-theme"));
     await page.goto(route);
+    await page.evaluate(() => localStorage.removeItem("portfolio-theme"));
+    await page.reload();
     const button = page.locator("[data-theme-toggle]");
     await expect(button).toHaveAttribute("aria-pressed", "false");
     await expect(button).toHaveAttribute("aria-label", route.startsWith("/ar") ? "التبديل إلى المظهر الداكن" : "Switch to dark theme");
