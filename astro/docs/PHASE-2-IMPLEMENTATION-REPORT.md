@@ -41,7 +41,7 @@ The canonical public story is limited to original Meteor, later React client and
 ## Constraints preserved
 
 - No change to Phase 1 PR #1, master, legacy React app, original CRA assets or production deployment.
-- No portfolio deployment, merge or PR creation in this implementation step.
+- No portfolio deployment or merge. Draft PR #2 was created to preserve a reviewable Phase 2 boundary dependent on PR #1.
 - No third featured position.
 - No project record deleted.
 - No real application screenshots invented.
