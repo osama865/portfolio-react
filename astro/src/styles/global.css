@@ -183,3 +183,6 @@ html[dir=rtl] .project-card .project-body{text-align:start}
 html[dir=rtl] .project-card .tags{direction:rtl}
 html[dir=rtl] .site-footer a,html[dir=rtl] .site-header a{unicode-bidi:plaintext}
 @media(max-width:700px){html[dir=rtl] .timeline{margin-inline-start:8px;padding-inline-start:18px}html[dir=rtl] .nav-wrap{direction:rtl}}
+
+/* Prevent long Latin identifiers inside Arabic editorial headings from widening mobile pages. */
+html[dir=rtl] .page-hero h1,html[dir=rtl] .simple-content{overflow-wrap:anywhere;word-break:normal}
