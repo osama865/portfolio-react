@@ -5,6 +5,8 @@ export function getStaticPaths(){return projects.map((project)=>({params:{slug:p
 const {project}=Astro.props;
 const injaz=project.slug==="injaz";
 const life=project.slug==="life-advise";
+const hotel=project.slug==="hotel-room-rental";
+const chat=project.slug==="chat-room";
 ---
 <SiteLayout title={`${project.name} — Osama Ibrahim`} description={project.description}>
 <section class="page-hero"><div class="container"><a class="read-link" href="/projects/">← All projects</a><small class="eyebrow"> / {project.category}</small><h1>{project.name}</h1><p>{project.description}</p><div class="case-meta"><span>{project.status}</span>{project.stack.map((item)=><span>{item}</span>)}</div><img class="case-image" src={project.image} alt={`${project.name} project screenshot`}/></div></section>
