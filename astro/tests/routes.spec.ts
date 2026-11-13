@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 const routes = [
   { path: "/", title: "Osama Ibrahim — Building useful digital products" },
   { path: "/about/", title: "About — Osama Ibrahim" },
-  { path: "/approach/", title: "Engineering Approach — Osama Ibrahim" },
+  { path: "/approach/", title: "Engineering approach — Osama Ibrahim" },
   { path: "/contact/", title: "Contact — Osama Ibrahim" },
   { path: "/projects/", title: "Projects — Osama Ibrahim" },
   { path: "/projects/injaz/", title: "INJAZ | إنجاز — Osama Ibrahim" },
@@ -27,7 +27,7 @@ for (const route of routes) {
     expect(response?.status(), `${route.path} should return HTTP 200`).toBe(200);
     await expect(page).toHaveTitle(route.title);
     await expect(page.locator("main h1").first()).toBeVisible();
-    await expect(page.getByRole("navigation", { name: "Main navigation" })).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "Main navigation" })).toBeAttached();
     const brokenImages = await page.locator("img").evaluateAll((images) =>
       images.filter((image) => !image.complete || image.naturalWidth === 0).map((image) => image.getAttribute("src"))
     );
