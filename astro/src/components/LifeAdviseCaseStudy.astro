@@ -1,0 +1,37 @@
+---
+const generations = [
+  ["2021 · Original","Meteor application","Historical source with Dexie/IndexedDB experiments and a service worker."],
+  ["Later · React","life-advice-client","React client snapshot with Dexie dependencies and a local database import path requiring repair."],
+  ["Backend reference","life-advise-server","Express service repository retained as backend reference; runtime and integration are not currently accepted."],
+  ["Now · Recovery","Evidence-led modernisation","Preserve data and provenance, reconcile generations, then test the complete offline and online lifecycle."]
+];
+---
+<section class="case-study">
+  <p class="eyebrow">FEATURED CASE STUDY / HISTORICAL ENGINEERING & RECOVERY</p>
+  <h2>A small application shaped by a very real connectivity constraint.</h2>
+  <p>Life-Advise began as an advice and quotation experience intended to remain useful when internet access was unreliable. Its history is not a single finished application: it spans an original Meteor generation, a later React client and a separate backend reference. The interesting engineering story is the evolution between those attempts—and the work required to recover them responsibly.</p>
+  <div class="case-meta"><span>Historical project</span><span>Recovery in progress</span><span>Runtime not verified</span></div>
+  <h3>Evolution across generations</h3>
+  <div class="timeline">{generations.map(([date,name,detail],i)=><article><b>{String(i+1).padStart(2,"0")}</b><div><small>{date}</small><h4>{name}</h4><p>{detail}</p></div></article>)}</div>
+  <h3>Offline-oriented engineering</h3>
+  <p>The original Meteor repository includes Dexie database helpers, a client service-worker registration module and a public service worker with shell caching, fetch fallback and notification handlers. The later React client declares Dexie and dexie-react-hooks dependencies and exposes a saved-advice route. These are source-level signs of an offline-first direction—not proof that every screen, record or user action works without a network connection.</p>
+  <div class="diagram" role="img" aria-label="Life-Advise historical evolution: user interface connected to local IndexedDB/Dexie and service worker for offline-oriented behavior, with online API/backend integration as a separate path; current recovery validates data and reconciles the generations.">
+    <div class="diagram-node"><b>Advice experience</b><small>Discover · random advice · saved items</small></div><div class="diagram-arrow">↙︎ <span>local path</span> &nbsp;&nbsp; ↘︎ <span>online path</span></div>
+    <div class="diagram-split"><div class="diagram-node"><b>Browser storage</b><small>IndexedDB · Dexie</small></div><div class="diagram-node"><b>Service worker</b><small>Shell cache · fallback · notifications</small></div></div>
+    <div class="diagram-arrow">↘︎ &nbsp;&nbsp; ↙︎</div><div class="diagram-node"><b>Express backend reference</b><small>API / data services — integration not currently verified</small></div>
+    <div class="diagram-note">Recovery work: preserve dataset snapshots and provenance, repair module boundaries, then verify offline, reconnect and synchronisation behaviour.</div>
+  </div>
+  <h3>What recovery has established</h3>
+  <ul>
+    <li>The original Meteor repository contains Dexie helpers in <code>database/client/indexDB.js</code> and service-worker registration in <code>imports/startup/client/serviceWorker.js</code>.</li>
+    <li>The historical service worker contains install/activate/fetch caching and push/notification handlers. Its presence does not establish successful push delivery or complete offline application behaviour.</li>
+    <li>The later React client has a saved-advice component importing <code>UseIndexedDB</code> through <code>src/DB/index.js</code>; at the inspected commit, the re-export target was not present in the repository tree. This is a likely build blocker that still needs a clean build to confirm.</li>
+    <li>Two recovered data snapshots contained 6,254 and 6,255 records respectively, with 5,538 unique text/author/language tuples across the snapshots. These are counts of those specific recovered files only—not a measurement of the complete historical collection.</li>
+  </ul>
+  <p class="evidence"><b>Current runtime status</b><br/>The previously listed public deployment returned HTTP 522 during the 13 Nov 2026 review. No current end-to-end, offline, reconnect, notification or clean-build acceptance has been established. This case study describes historical source and recovery findings, not a currently operational product.</p>
+  <h3>What remains to be done</h3>
+  <ul><li>Resolve the React IndexedDB module boundary and run a clean reproducible build.</li><li>Establish the canonical data snapshot and document provenance without inflating historical counts.</li><li>Test saved records, cache behaviour, cold-start offline use and reconnect reconciliation in target browsers.</li><li>Verify the frontend/backend contract and remove obsolete localhost or historical endpoint assumptions.</li><li>Reassess notification and service-worker behaviour independently of static source inspection.</li></ul>
+  <h3>Contribution and attribution</h3>
+  <p>The project is included as a personal historical engineering journey. Repository ownership and recovered source do not, by themselves, prove sole authorship of every component. Original implementation, later adaptations and exact backend/API contributions remain separated in the internal attribution record pending confirmation.</p>
+  <div class="case-links"><a class="read-link" href="https://github.com/osama865/Life-Advise" target="_blank" rel="noreferrer">Original Meteor source ↗</a><a class="read-link" href="https://github.com/osama865/life-advice-client" target="_blank" rel="noreferrer">React client ↗</a><a class="read-link" href="https://github.com/osama865/life-advise-server" target="_blank" rel="noreferrer">Express backend reference ↗</a></div>
+</section>
