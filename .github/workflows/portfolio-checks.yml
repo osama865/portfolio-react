@@ -142,6 +142,16 @@ jobs:
           DEPLOYED_PREVIEW_URL: ${{ steps.preview.outputs.url }}
           EXPECTED_DEPLOYED_COMMIT: ${{ steps.preview.outputs.commit }}
         run: npm run test:preview
+      - name: Lighthouse production-preview assessment
+        if: |
+          (github.event_name == 'push' && github.ref == 'refs/heads/phase-2/evidence-backed-case-studies') ||
+          (github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'phase-2/evidence-backed-case-studies' && github.event.pull_request.base.ref == 'phase-1/astro-foundation')
+        env:
+          DEPLOYED_PREVIEW_URL: ${{ steps.preview.outputs.url }}
+        run: |
+          mkdir -p lighthouse
+          npx --yes lighthouse@12.8.2 "$DEPLOYED_PREVIEW_URL" --chrome-flags="--headless --no-sandbox" --only-categories=performance,accessibility,best-practices,seo --output=json --output-path=lighthouse/mobile.json
+          npx --yes lighthouse@12.8.2 "$DEPLOYED_PREVIEW_URL" --preset=desktop --chrome-flags="--headless --no-sandbox" --only-categories=performance,accessibility,best-practices,seo --output=json --output-path=lighthouse/desktop.json
       - name: Confirm dependency manifests remain unchanged
         run: git diff --exit-code HEAD -- package.json package-lock.json
       - name: Publish visual evidence index to job summary
@@ -165,4 +175,5 @@ jobs:
             astro/package-lock.json
             astro/docs/PHASE-1.5-VISUAL-EVIDENCE.md
             astro/preview-readiness.json
+            astro/lighthouse/
           if-no-files-found: ignore
