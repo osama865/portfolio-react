@@ -121,7 +121,7 @@ html[data-theme=dark] .hero-quote em{color:var(--blue)}
 .case-study h2{font-size:clamp(30px,4vw,43px);line-height:1.18;letter-spacing:-.04em;margin:14px 0 18px}
 .case-study h3{font-size:23px;margin:42px 0 12px}
 .case-study p,.case-study li{color:var(--muted);line-height:1.85}
-.case-study ul{padding-left:22px}
+.case-study ul{padding-inline-start:22px}
 .case-study li{margin:10px 0}
 .case-study code{font-size:.88em;background:var(--soft);padding:2px 5px;border-radius:4px}
 .case-study .evidence{color:var(--text);margin-top:30px}
@@ -136,9 +136,9 @@ html[data-theme=dark] .hero-quote em{color:var(--blue)}
 .workflow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:20px 0;padding:18px;background:var(--soft);border-radius:10px}
 .workflow div{flex:1 1 130px;padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:7px;text-align:center;font-size:11px;font-weight:600}
 .workflow i{font-style:normal;color:var(--blue)}
-.timeline{border-left:1px solid var(--line);margin:25px 0 25px 10px;padding-left:24px}
+.timeline{border-inline-start:1px solid var(--line);margin:25px 10px 25px 0;padding-inline-start:24px}
 .timeline article{display:grid;grid-template-columns:42px 1fr;gap:14px;position:relative;padding:0 0 24px}
-.timeline article:before{content:"";position:absolute;left:-29px;top:7px;width:9px;height:9px;border-radius:50%;background:var(--blue);outline:4px solid var(--bg)}
+.timeline article:before{content:"";position:absolute;inset-inline-start:-29px;top:7px;width:9px;height:9px;border-radius:50%;background:var(--blue);outline:4px solid var(--bg)}
 .timeline article>b{font:11px "IBM Plex Mono",monospace;color:var(--blue);padding-top:3px}
 .timeline article small{font:10px "IBM Plex Mono",monospace;color:var(--muted)}
 .timeline article h4{font-size:17px;margin:4px 0}
@@ -166,3 +166,20 @@ html::view-transition-old(root),html::view-transition-new(root){animation:none;m
 html::view-transition-new(root){clip-path:circle(0 at var(--theme-origin-x,50%) var(--theme-origin-y,30px));animation:theme-reveal 650ms cubic-bezier(.2,.72,.2,1) forwards}
 @keyframes theme-reveal{to{clip-path:circle(150vmax at var(--theme-origin-x,50%) var(--theme-origin-y,30px))}}
 @media(prefers-reduced-motion:reduce){html::view-transition-new(root){animation:none;clip-path:none}.theme-icon{transition:none}}
+
+/* RTL-specific alignment refinements */
+html[dir=rtl] .timeline{margin-inline-start:10px;margin-inline-end:0;padding-inline-start:24px}
+html[dir=rtl] .timeline article{direction:rtl}
+html[dir=rtl] .workflow{direction:rtl}
+html[dir=rtl] .project-filters,html[dir=rtl] .writing-filters{direction:rtl}
+html[dir=rtl] .case-meta{direction:rtl}
+html[dir=rtl] .writing-entry{direction:rtl}
+html[dir=rtl] .writing-meta{direction:rtl}
+html[dir=rtl] .footer-wrap{direction:rtl}
+html[dir=rtl] .diagram-node,html[dir=rtl] .diagram-note{font-family:"IBM Plex Sans Arabic","IBM Plex Sans",sans-serif}
+html[dir=rtl] h1,html[dir=rtl] h2,html[dir=rtl] h3,html[dir=rtl] h4{line-height:1.45}
+html[dir=rtl] .hero-quote{letter-spacing:0}
+html[dir=rtl] .project-card .project-body{text-align:start}
+html[dir=rtl] .project-card .tags{direction:rtl}
+html[dir=rtl] .site-footer a,html[dir=rtl] .site-header a{unicode-bidi:plaintext}
+@media(max-width:700px){html[dir=rtl] .timeline{margin-inline-start:8px;padding-inline-start:18px}html[dir=rtl] .nav-wrap{direction:rtl}}
