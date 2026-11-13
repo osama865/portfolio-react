@@ -1,7 +1,7 @@
 export const prerender = true;
 
 export function GET() {
-  const siteUrl = process.env.PUBLIC_SITE_URL?.replace(/\\/+$/, "");
+  const siteUrl = process.env.PUBLIC_SITE_URL?.replace(/\/+$/, "");
   const indexable = process.env.PUBLIC_SITE_INDEXABLE === "true" && Boolean(siteUrl);
   const body = indexable
     ? `User-agent: *
