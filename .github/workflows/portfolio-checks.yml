@@ -52,6 +52,36 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Browser tests and responsive screenshots
         run: npm run test:e2e
+      - name: Validate deployed-preview event and branch matrix
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF: ${{ github.ref }}
+          PR_BASE: ${{ github.event.pull_request.base.ref }}
+        run: |
+          node --input-type=module <<'NODE'
+          const previewEnabled = (event, ref, base) =>
+            (event === 'push' && ref === 'refs/heads/phase-1/astro-foundation') ||
+            (event === 'workflow_dispatch' && ref === 'refs/heads/phase-1/astro-foundation') ||
+            (event === 'pull_request' && base === 'master');
+          const cases = [
+            ['Phase 2 push', 'push', 'refs/heads/phase-2/evidence-backed-case-studies', '', false],
+            ['PR #2 to Phase 1 branch', 'pull_request', 'refs/heads/phase-2/evidence-backed-case-studies', 'phase-1/astro-foundation', false],
+            ['Phase 1.5 push', 'push', 'refs/heads/phase-1/astro-foundation', '', true],
+            ['Phase 1.5 manual dispatch', 'workflow_dispatch', 'refs/heads/phase-1/astro-foundation', '', true],
+            ['PR to master', 'pull_request', 'refs/heads/topic', 'master', true],
+            ['Phase 2 manual dispatch', 'workflow_dispatch', 'refs/heads/phase-2/evidence-backed-case-studies', '', false],
+            ['master push', 'push', 'refs/heads/master', '', false]
+          ];
+          for (const [label, event, ref, base, expected] of cases) {
+            const actual = previewEnabled(event, ref, base);
+            if (actual !== expected) throw new Error(`${label}: expected preview=${expected}, got ${actual}`);
+            console.log(`PASS ${label}: preview=${actual}`);
+          }
+          const actualEvent = process.env.EVENT_NAME;
+          const actualRef = process.env.REF;
+          const actualBase = process.env.PR_BASE;
+          console.log('Current run preview eligibility:', previewEnabled(actualEvent, actualRef, actualBase));
+          NODE
       - name: Wait for the exact commit on the isolated Cloudflare preview
         if: |
           (github.event_name == 'push' && github.ref == 'refs/heads/phase-1/astro-foundation') ||
