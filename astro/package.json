@@ -7,7 +7,8 @@
     "build": "astro build",
     "check": "astro check",
     "test:e2e": "playwright test",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "test:preview": "playwright test tests/deployed-preview.spec.ts --project=desktop-chromium"
   },
   "dependencies": {
     "astro": "7.4.11"

@@ -49,6 +49,10 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Browser tests and responsive screenshots
         run: npm run test:e2e
+      - name: Verify theme interactions on the deployed Astro preview
+        env:
+          DEPLOYED_PREVIEW_URL: https://osama-portfolio-preview.pages.dev
+        run: npm run test:preview
       - name: Confirm dependency manifests remain unchanged
         run: git diff --exit-code HEAD -- package.json package-lock.json
       - name: Upload browser and audit evidence
