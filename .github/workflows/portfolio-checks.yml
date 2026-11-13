@@ -67,7 +67,7 @@ jobs:
             (event === 'pull_request' && base === 'master');
           const cases = [
             ['Phase 2 push', 'push', 'refs/heads/phase-2/evidence-backed-case-studies', '', true],
-  ['PR #2 to Phase 1', 'pull_request', 'refs/pull/2/merge', 'phase-1/astro-foundation', true],
+            ['PR #2 to Phase 1', 'pull_request', 'refs/pull/2/merge', 'phase-1/astro-foundation', true],
             ['Phase 1.5 push', 'push', 'refs/heads/phase-1/astro-foundation', '', true],
             ['Phase 1.5 manual dispatch', 'workflow_dispatch', 'refs/heads/phase-1/astro-foundation', '', true],
             ['PR to master', 'pull_request', 'refs/heads/topic', 'master', true],
