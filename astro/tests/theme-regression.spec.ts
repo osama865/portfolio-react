@@ -89,7 +89,7 @@ test("the selected theme persists across internal navigation and reload", async 
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  await page.getByRole("button", { name: "Toggle light and dark theme" }).click();
+  await page.locator("[data-theme-toggle]").click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
