@@ -29,7 +29,10 @@ for (const route of routes) {
     await expect(page.locator("main h1").first()).toBeVisible();
     await expect(page.getByRole("navigation", { name: "Main navigation" })).toBeAttached();
     const brokenImages = await page.locator("img").evaluateAll((images) =>
-      images.filter((image) => !image.complete || image.naturalWidth === 0).map((image) => image.getAttribute("src"))
+      images.filter((image) => {
+        const img = image as HTMLImageElement;
+        return !img.complete || img.naturalWidth === 0;
+      }).map((image) => image.getAttribute("src"))
     );
     expect(brokenImages, `Broken images on ${route.path}`).toEqual([]);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
