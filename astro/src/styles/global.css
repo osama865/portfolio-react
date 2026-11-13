@@ -145,3 +145,24 @@ html[data-theme=dark] .hero-quote em{color:var(--blue)}
 .timeline article p{margin:0}
 @media(max-width:700px){.featured-case-grid{grid-template-columns:1fr}.featured-case{min-height:220px;padding:22px}.diagram{padding:14px}.diagram-split{grid-template-columns:1fr}.workflow{align-items:stretch}.workflow i{width:100%;text-align:center;line-height:10px}}
 .archive-note{padding:22px 24px;margin-bottom:28px;background:var(--surface);border:1px solid var(--line);border-radius:12px}.archive-note p{color:var(--muted);font-size:13px;margin:8px 0}.archive-note a{color:var(--blue);font-weight:600}@media(max-width:700px){.archive-note{padding:18px}}
+
+/* Locale-aware layout and editorial Arabic typography */
+html[dir="rtl"] body{font-family:"IBM Plex Sans Arabic","IBM Plex Sans",sans-serif}
+html[dir="rtl"] .eyebrow,html[dir="rtl"] .case-meta,html[dir="rtl"] .writing-index{letter-spacing:0}
+html[dir="rtl"] .nav-wrap{direction:rtl}
+html[dir="rtl"] .hero-quote,html[dir="rtl"] .hero-intro,html[dir="rtl"] .simple-content{text-align:start}
+.nav-tools{display:flex;align-items:center;gap:12px}
+.language-switch{font-size:12px;font-weight:600;color:var(--text);text-decoration:none;border-inline-end:1px solid var(--line);padding-inline-end:12px}
+.theme-button{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--line);border-radius:50%;background:var(--surface);color:var(--text);cursor:pointer;transition:background .2s,border-color .2s}
+.theme-button:focus-visible,.language-switch:focus-visible,.menu-button:focus-visible{outline:2px solid var(--blue);outline-offset:4px}
+.theme-icon{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;position:absolute;transition:opacity .24s ease,transform .32s cubic-bezier(.2,.8,.2,1)}
+.theme-button{position:relative}
+.theme-icon-sun{opacity:0;transform:rotate(-65deg) scale(.65)}
+.theme-icon-moon{opacity:1;transform:rotate(0) scale(1)}
+html[data-theme=dark] .theme-icon-sun{opacity:1;transform:rotate(0) scale(1)}
+html[data-theme=dark] .theme-icon-moon{opacity:0;transform:rotate(65deg) scale(.65)}
+html::view-transition-group(root){animation-duration:650ms}
+html::view-transition-old(root),html::view-transition-new(root){animation:none;mix-blend-mode:normal}
+html::view-transition-new(root){clip-path:circle(0 at var(--theme-origin-x,50%) var(--theme-origin-y,30px));animation:theme-reveal 650ms cubic-bezier(.2,.72,.2,1) forwards}
+@keyframes theme-reveal{to{clip-path:circle(150vmax at var(--theme-origin-x,50%) var(--theme-origin-y,30px))}}
+@media(prefers-reduced-motion:reduce){html::view-transition-new(root){animation:none;clip-path:none}.theme-icon{transition:none}}
