@@ -12,7 +12,6 @@ const isLife=slug==="projects/life-advise";
 const isAbout=slug==="about";
 const isApproach=slug==="approach";
 const isContact=slug==="contact";
-const isWriting=slug==="writing";
 const projectSlug=slug.startsWith("projects/")?slug.split("/")[1]:null;
 const archiveProject=projectSlug?projects.find(p=>p.slug===projectSlug):null;
 const isOtherProject=!!archiveProject&&!isInjaz&&!isLife;
