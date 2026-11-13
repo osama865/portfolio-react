@@ -28,12 +28,19 @@ for (const route of routes) {
     await expect(page).toHaveTitle(route.title);
     await expect(page.locator("main h1").first()).toBeVisible();
     await expect(page.locator("nav[data-nav]")).toBeAttached();
-    const brokenImages = await page.locator("img").evaluateAll((images) =>
-      images.filter((image) => {
+    const brokenImages = await page.locator("img").evaluateAll(async (images) => {
+      const results = await Promise.all(images.map(async (image) => {
         const img = image as HTMLImageElement;
-        return !img.complete || img.naturalWidth === 0;
-      }).map((image) => image.getAttribute("src"))
-    );
+        img.loading = "eager";
+        try {
+          await img.decode();
+          return img.naturalWidth === 0 ? img.getAttribute("src") : null;
+        } catch {
+          return img.getAttribute("src");
+        }
+      }));
+      return results.filter((src): src is string => Boolean(src));
+    });
     expect(brokenImages, `Broken images on ${route.path}`).toEqual([]);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
     expect(overflow, `Horizontal overflow on ${route.path}`).toBe(false);
