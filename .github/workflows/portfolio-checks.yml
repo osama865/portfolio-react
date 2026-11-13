@@ -61,10 +61,11 @@ jobs:
           node --input-type=module <<'NODE'
           const previewEnabled = (event, ref, base) =>
             (event === 'push' && ref === 'refs/heads/phase-1/astro-foundation') ||
+            (event === 'push' && ref === 'refs/heads/phase-2/evidence-backed-case-studies') ||
             (event === 'workflow_dispatch' && ref === 'refs/heads/phase-1/astro-foundation') ||
             (event === 'pull_request' && base === 'master');
           const cases = [
-            ['Phase 2 push', 'push', 'refs/heads/phase-2/evidence-backed-case-studies', '', false],
+            ['Phase 2 push', 'push', 'refs/heads/phase-2/evidence-backed-case-studies', '', true],
             ['PR #2 to Phase 1 branch', 'pull_request', 'refs/heads/phase-2/evidence-backed-case-studies', 'phase-1/astro-foundation', false],
             ['Phase 1.5 push', 'push', 'refs/heads/phase-1/astro-foundation', '', true],
             ['Phase 1.5 manual dispatch', 'workflow_dispatch', 'refs/heads/phase-1/astro-foundation', '', true],
@@ -84,13 +85,14 @@ jobs:
           NODE
       - name: Wait for the exact commit on the isolated Cloudflare preview
         if: |
+          (github.event_name == 'push' && github.ref == 'refs/heads/phase-2/evidence-backed-case-studies') ||
           (github.event_name == 'push' && github.ref == 'refs/heads/phase-1/astro-foundation') ||
           (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/phase-1/astro-foundation') ||
           (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'master')
         id: preview
         env:
           EXPECTED_PREVIEW_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-          PREVIEW_URL: https://osama-portfolio-preview.pages.dev
+          PREVIEW_URL: ${{ github.ref == 'refs/heads/phase-2/evidence-backed-case-studies' && 'https://phase-2-evidence-backed-case.osama-portfolio-preview.pages.dev' || 'https://osama-portfolio-preview.pages.dev' }}
         run: |
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
