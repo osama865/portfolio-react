@@ -1,20 +1,28 @@
 import { test, expect } from "@playwright/test";
 
 const previewUrl = process.env.DEPLOYED_PREVIEW_URL;
+const expectedCommit = process.env.EXPECTED_DEPLOYED_COMMIT;
 
 test.skip(!previewUrl, "Runs only when the isolated Cloudflare preview URL is supplied.");
+
+test("deployed Astro preview serves the exact verified commit", async ({ page }) => {
+  await page.goto(previewUrl!);
+  await expect(page).toHaveTitle(/A developer, a dreamer, and ever so often, a human/);
+  if (expectedCommit) {
+    await expect(page.locator("meta[name='portfolio-build-commit']")).toHaveAttribute("content", expectedCommit);
+    await expect(page.locator("html")).toHaveAttribute("data-build-commit", expectedCommit);
+  }
+});
 
 test("deployed Astro preview changes theme only through its explicit switch", async ({ page }) => {
   const origin = previewUrl!;
   const route = (path: string) => new URL(path, origin).toString();
-
   await page.goto(origin);
   await expect(page).toHaveTitle(/A developer, a dreamer, and ever so often, a human/);
   const initial = await page.locator("html").getAttribute("data-theme");
   await expect(page.locator("button[data-theme-toggle]")).toHaveCount(1);
   await expect(page.locator("button[data-theme]")).toHaveCount(0);
 
-  // Ordinary content clicks must not affect theme state.
   await page.locator(".hero-quote").click();
   await page.locator(".hero-intro p").click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", initial!);
@@ -22,7 +30,6 @@ test("deployed Astro preview changes theme only through its explicit switch", as
   await expect(page).toHaveURL(route("/about/"));
   await expect(page.locator("html")).toHaveAttribute("data-theme", initial!);
 
-  // Project-card navigation and filter buttons are not theme controls.
   await page.goto(route("/projects/"));
   await page.getByRole("button", { name: "Website", exact: true }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", initial!);
@@ -31,13 +38,11 @@ test("deployed Astro preview changes theme only through its explicit switch", as
   await expect(page).toHaveURL(/\/projects\/[^/]+\/$/);
   await expect(page.locator("html")).toHaveAttribute("data-theme", initial!);
 
-  // Opening an article is also theme-neutral.
   await page.goto(route("/writing/"));
   await page.locator(".writing-entry h2 a").first().click();
   await expect(page).toHaveURL(/\/writing\/[^/]+\/$/);
   await expect(page.locator("html")).toHaveAttribute("data-theme", initial!);
 
-  // The explicit theme control changes the attribute once and persists it.
   await page.goto(origin);
   const control = page.locator("button[data-theme-toggle]");
   await page.evaluate(() => {
@@ -56,4 +61,39 @@ test("deployed Astro preview changes theme only through its explicit switch", as
   expect(await page.evaluate(() => localStorage.getItem("portfolio-theme"))).toBe(afterToggle);
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", afterToggle);
+});
+
+test("capture deployed preview visual evidence", async ({ page }, info) => {
+  const origin = previewUrl!;
+  const device = info.project.name.startsWith("mobile") ? "mobile" : "desktop";
+  const capture = async (name: string) => {
+    await page.evaluate(() => document.fonts.ready);
+    await page.screenshot({ path: `test-results/evidence/deployed-${device}-${name}.png`, fullPage: true });
+  };
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto(origin);
+  await capture("home-light");
+  await page.getByRole("button", { name: "Toggle light and dark theme" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await capture("home-dark");
+
+  const pages = [
+    { path: "/projects/", name: "work-archive" },
+    { path: "/writing/", name: "writing-archive" },
+    { path: "/writing/choose-node-framework/", name: "writing-entry" },
+    { path: "/about/", name: "about" },
+    { path: "/approach/", name: "engineering-approach" },
+    { path: "/projects/injaz/", name: "project-case-study" }
+  ];
+  for (const item of pages) {
+    await page.goto(new URL(item.path, origin).toString());
+    await capture(item.name);
+  }
+  if (device === "mobile") {
+    await page.goto(origin);
+    const menu = page.getByRole("button", { name: "Toggle navigation" });
+    await menu.click();
+    await expect(menu).toHaveAttribute("aria-expanded", "true");
+    await capture("mobile-navigation-open");
+  }
 });
