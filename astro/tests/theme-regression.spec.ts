@@ -16,14 +16,14 @@ test("ordinary page content clicks never change the theme", async ({ page }) => 
 test("project card navigation preserves the selected theme", async ({ page }) => {
   await page.goto("/projects/");
   await page.locator(".project-card .project-cover").first().click();
-  await expect(page).toHaveURL(/\\/projects\\/[^/]+\\/$/);
+  await expect(page).toHaveURL(new RegExp("/projects/[^/]+/$"));
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
 });
 
 test("opening a writing article does not change the theme", async ({ page }) => {
   await page.goto("/writing/");
   await page.locator(".writing-entry h2 a").first().click();
-  await expect(page).toHaveURL(/\\/writing\\/[^/]+\\/$/);
+  await expect(page).toHaveURL(new RegExp("/writing/[^/]+/$"));
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
 });
 
@@ -34,7 +34,7 @@ test("navigation and ordinary buttons do not change the theme", async ({ page },
     await page.getByRole("button", { name: "Toggle navigation" }).click();
   }
   await page.getByRole("link", { name: "About", exact: true }).click();
-  await expect(page).toHaveURL(/\\/about\\/$/);
+  await expect(page).toHaveURL("/about/");
   expect(await currentTheme(page)).toBe(before);
 
   await page.goto("/projects/");
@@ -46,8 +46,16 @@ test("the explicit theme switch changes the theme exactly once per activation", 
   await page.goto("/");
   const control = page.getByRole("button", { name: "Toggle light and dark theme" });
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await page.evaluate(() => {
+    const root = document.documentElement;
+    let changes = 0;
+    const observer = new MutationObserver(() => { changes += 1; });
+    observer.observe(root, { attributes: true, attributeFilter: ["data-theme"] });
+    (window as typeof window & { __themeChanges?: () => number }).__themeChanges = () => changes;
+  });
   await control.click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect.poll(() => page.evaluate(() => (window as typeof window & { __themeChanges?: () => number }).__themeChanges?.() ?? 0)).toBe(1);
   expect(await page.evaluate(() => localStorage.getItem("portfolio-theme"))).toBe("dark");
   await control.click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
@@ -59,7 +67,7 @@ test("the selected theme persists across internal navigation and reload", async 
   await page.getByRole("button", { name: "Toggle light and dark theme" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await page.getByRole("link", { name: "Writing", exact: true }).click();
-  await expect(page).toHaveURL(/\\/writing\\/$/);
+  await expect(page).toHaveURL("/writing/");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
