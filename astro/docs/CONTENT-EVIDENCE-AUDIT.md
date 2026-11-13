@@ -50,3 +50,10 @@
 ## Astro build isolation correction
 
 The first CI browser run exposed that the Astro config pointed `publicDir` at the legacy React app's root `public/` directory. That directory contains the old Create React App `index.html`, which was copied into Astro's output and overwrote the generated Astro homepage. The Astro app now uses its own `astro/public/` directory, populated with copies of the 29 required legacy assets (28 files under `public/assets/` plus the favicon). The original root `public/` directory remains unchanged. A fresh production-preview browser run is required to confirm that the served homepage is now the Astro version.
+
+
+## Dependency and route verification update
+
+The Astro app now has an isolated `astro/public/` directory, so the legacy Create React App `public/index.html` can no longer overwrite Astro's generated homepage. The new directory contains copies of the required legacy images and favicon; root legacy assets remain untouched.
+
+Dependency security findings were remediated by upgrading to Astro 7.4.11 and pinning all direct dependencies. The committed lockfile is version 3; CI runs `npm ci` and fails closed on audit findings. The 13 November 2026 audit reports 0 vulnerabilities. The latest successful browser run passed 43 tests with one intentional skip, including all 18 generated routes at desktop and mobile sizes. See `DEPENDENCY-SECURITY-AUDIT.md` and the attached workflow artifact for details.
