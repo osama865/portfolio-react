@@ -123,6 +123,71 @@ test("deployed preview preserves theme and locale navigation on desktop and mobi
   await expect(page.locator("html")).toHaveAttribute("data-theme", selected);
 });
 
+
+test("audit every configured external destination and preserve its response evidence", async ({ request }, info) => {
+  test.skip(info.project.name !== "desktop-chromium", "Run the external destination audit once per workflow.");
+  test.setTimeout(180_000);
+
+  const destinations = [
+    ...projects.flatMap((project) => [
+      ...(project.source ? [{ category: "project-source", label: project.name, url: project.source }] : []),
+      ...(project.reference ? [{ category: "historical-project-reference", label: project.name, url: project.reference }] : [])
+    ]),
+    ...writing.flatMap((item) => [
+      { category: "original-writing", label: item.title, url: item.url },
+      ...(item.alternate ? [{ category: "alternate-writing", label: item.title, url: item.alternate }] : [])
+    ]),
+    ...[
+      ["GitHub profile", "https://github.com/osama865"],
+      ["Medium profile", "https://medium.com/@osama1010"],
+      ["DEV profile", "https://dev.to/osam1010"],
+      ["X profile", "https://x.com/Osam1010"],
+      ["LinkedIn profile", "https://www.linkedin.com/in/osama-ibrahim-a854841a5/"]
+    ].map(([label, url]) => ({ category: "social-profile", label, url }))
+  ];
+  const unique = [...new Map(destinations.map((item) => [item.url, item])).values()];
+  const results = [];
+
+  for (const item of unique) {
+    try {
+      const response = await request.get(item.url, { timeout: 15_000, maxRedirects: 8 });
+      const status = response.status();
+      const disposition =
+        status >= 200 && status < 400 ? "reachable" :
+        status === 404 || status === 410 ? "unavailable" :
+        status === 401 || status === 403 || status === 429 ? "access-restricted" :
+        status >= 500 ? "server-error" : "http-error";
+      results.push({
+        ...item,
+        status,
+        finalUrl: response.url(),
+        disposition
+      });
+    } catch (error) {
+      results.push({
+        ...item,
+        status: null,
+        finalUrl: null,
+        disposition: "network-error",
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+    console.log("EXTERNAL LINK AUDIT", JSON.stringify(results[results.length - 1]));
+  }
+
+  mkdirSync("test-results", { recursive: true });
+  writeFileSync(
+    "test-results/external-link-audit.json",
+    JSON.stringify({
+      checkedAt: new Date().toISOString(),
+      checkedCount: results.length,
+      results,
+      note: "HTTP reachability is not semantic endorsement. 401/403/429 and network errors require manual interpretation; historical project references remain labelled as historical."
+    }, null, 2)
+  );
+  expect(results.length).toBe(unique.length);
+});
+
 test("capture English and Arabic visual matrix on deployed preview", async ({ page }, info) => {
   const device = info.project.name.startsWith("mobile") ? "mobile" : "desktop";
   const capture = async (name: string) => {
