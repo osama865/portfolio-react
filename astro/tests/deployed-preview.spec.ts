@@ -78,6 +78,20 @@ test("every deployed locale route is usable at mobile, tablet and desktop widths
     }));
     expect(dimensions.scrollWidth, `orientation overflow at ${size.width}x${size.height}`).toBeLessThanOrEqual(dimensions.clientWidth + 1);
   }
+  // The isolated preview must never advertise itself as the production canonical.
+  await expect(page.locator("link[rel=canonical]")).toHaveCount(0);
+  await expect(page.locator("link[hreflang]")).toHaveCount(0);
+  await expect(page.locator("meta[property='og:url']")).toHaveCount(0);
+
+  const robots = await page.request.get(route("/robots.txt"));
+  expect(robots.ok()).toBeTruthy();
+  expect(await robots.text()).toContain("Disallow: /");
+  const sitemap = await page.request.get(route("/sitemap.xml"));
+  expect(sitemap.ok()).toBeTruthy();
+  const sitemapText = await sitemap.text();
+  expect(sitemapText).toContain("<urlset");
+  expect(sitemapText).not.toContain("<loc>");
+  expect(robots.headers()["x-robots-tag"] ?? "").toContain("noindex");
 });
 
 test("deployed preview preserves theme and locale navigation on desktop and mobile", async ({ page }, info) => {
