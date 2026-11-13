@@ -4,7 +4,7 @@
 **Repository:** `osama865/portfolio-react`  
 **PR:** [#2 — Draft, open, unmerged](https://github.com/osama865/portfolio-react/pull/2)  
 **Branch:** `phase-2/evidence-backed-case-studies`  
-**Latest source candidate covered by the most recent run request:** `2bcd69830083a844c22f5aa5660f2b89e2bbc8db`  
+**Latest exact-head verification:** `0f6905cb24dcb65ecdf83c2f8a7f009d75ceb59d` (run 43501211322)  
 **Current acceptance:** Not accepted
 
 ## 1. Exact-head CI ledger
@@ -14,7 +14,8 @@
 | [43492092393](https://github.com/osama865/portfolio-react/actions/runs/43492092393) | `9413757fcde394ad3c1db99b7ff019733aa9f85a` | 105 passed / 0 failed / 7 skipped (112 total) | Passed | [14070196272](https://github.com/osama865/portfolio-react/actions/runs/43492092393/artifacts/14070196272) |
 | [43494823880](https://github.com/osama865/portfolio-react/actions/runs/43494823880) | `d38845b2e94add2fc9b64ac7d0f35dff36630163` | 110 passed / 13 failed / 7 skipped (130 total) | Clean install, audit, diagnostics, build passed | [14071462406](https://github.com/osama865/portfolio-react/actions/runs/43494823880/artifacts/14071462406) |
 | [43495874766](https://github.com/osama865/portfolio-react/actions/runs/43495874766) | `effa9ad4d8f5c96ae836b21e5660718d48dfa31b` | 116 passed / 9 failed / 7 skipped (132 total) | Clean install, audit, diagnostics, build passed | [14072175689](https://github.com/osama865/portfolio-react/actions/runs/43495874766/artifacts/14072175689) |
-| [43496996017](https://github.com/osama865/portfolio-react/actions/runs/43496996017) | `2bcd69830083a844c22f5aa5660f2b89e2bbc8db` | Pending; no totals | No completed result available | No artifact available |
+| [43496996017](https://github.com/osama865/portfolio-react/actions/runs/43496996017) | `2bcd69830083a844c22f5aa5660f2b89e2bbc8db` | Historical superseded attempt; no acceptance totals | Superseded | No current acceptance value |
+| [43501211322](https://github.com/osama865/portfolio-react/actions/runs/43501211322) | `0f6905cb24dcb65ecdf83c2f8a7f009d75ceb59d` | **127 passed / 0 failed / 9 skipped (136 total)** local; **8 passed / 0 failed** deployed | Clean install, audit, diagnostics, build, local and deployed suites passed | [14075375001](https://github.com/osama865/portfolio-react/actions/runs/43501211322/artifacts/14075375001) |
 
 The baseline run 43492092393 is English-only and predates the Arabic/theme implementation. It is not current acceptance evidence. Cancelled/superseded runs are not counted as passes.
 
@@ -30,7 +31,7 @@ The new exhaustive route test enumerates:
 
 For every generated route it checks document language/direction, visible H1 and non-empty content, absence of common unresolved placeholders, route-switch destination, internal route allowlist, title/description/Open Graph/Twitter metadata, and horizontal overflow at configured desktop/mobile viewports.
 
-Run 43495874766 executed this test: desktop route sweep passed; the mobile sweep found the `/ar/writing/document-designmode/` overflow described above. The overflow CSS correction, language-switch identity assertion correction, storage-origin test correction, and stale theme-selector corrections are committed after that run. The next exact-head run must confirm all 60 dynamic project/writing routes and their language counterparts.
+Run 43495874766 executed this test: desktop route sweep passed; the mobile sweep found the `/ar/writing/document-designmode/` overflow described above. The overflow CSS correction, language-switch identity assertion correction, storage-origin test correction, and stale theme-selector corrections are committed after that run. Exact-head run 43501211322 subsequently passed the full local browser suite, including the exhaustive route/locale sweep and mobile overflow assertions.
 
 Archive regression assertions remain: 13 project cards, 17 writing entries, exactly two featured case studies, and the third featured position intentionally empty.
 
@@ -40,9 +41,9 @@ The correct isolated Astro preview project is `osama-portfolio-preview`. The leg
 
 - Last confirmed isolated preview: commit `20b0283`, URL [https://f703fcbd.osama-portfolio-preview.pages.dev](https://f703fcbd.osama-portfolio-preview.pages.dev).
 - Stable branch alias: [https://phase-2-evidence-backed-case.osama-portfolio-preview.pages.dev](https://phase-2-evidence-backed-case.osama-portfolio-preview.pages.dev).
-- The latest source candidate `2bcd69830083a844c22f5aa5660f2b89e2bbc8db` received a Cloudflare build-in-progress notification; no successful deployment with that exact SHA has been verified yet.
+- Exact-head run 43501211322 deployed commit `0f6905cb24dcb65ecdf83c2f8a7f009d75ceb59d` to [https://be90b699.osama-portfolio-preview.pages.dev](https://be90b699.osama-portfolio-preview.pages.dev). The stable branch alias returned HTTP 200 and `portfolio-build-commit` exactly matched the same full SHA; evidence is in `preview-readiness.json` inside artifact 14075375001.
 
-The workflow now includes Phase 2 push preview readiness: it polls the isolated branch alias until the embedded `portfolio-build-commit` marker equals the run's exact SHA, then runs deployed browser checks. The deployed test covers the exact marker, bilingual locale switching, theme interaction, English/Arabic homepages, archives, both featured case studies, writing archive/detail, desktop/mobile screenshots, and open mobile navigation. It also runs an axe-core WCAG 2.1 A/AA smoke scan on representative routes. This suite has not yet produced successful results for the latest source candidate.
+The workflow now includes Phase 2 PR/push preview readiness: it polls the isolated branch alias until the embedded `portfolio-build-commit` marker equals the run's exact SHA, then runs deployed browser checks. Run 43501211322 passed exact marker verification, bilingual locale switching, theme interaction, visual capture, and deployed axe scans. The artifact includes 46 PNG screenshots, traces, full axe JSON, Playwright report, audit JSON and preview-readiness evidence.
 
 Earlier artifact screenshots inspected:
 - English desktop homepage and project archive.
@@ -85,12 +86,12 @@ Arabic copy is implemented across all requested portfolio-owned routes, but no i
 
 | Blocker | Evidence | Disposition |
 |---|---|---|
-| Exact-head CI for final report head | Latest source candidate run 43496996017 pending; report-only update creates a newer head requiring another run | Must pass on exact final PR head; inspect full counts and artifact |
-| Exact-SHA preview | Last confirmed isolated deployment is 20b0283, not latest source candidate | Wait for latest branch preview; require marker equality and deployed browser tests |
-| Visual acceptance | Older screenshots inspected; latest bilingual matrix not yet produced/inspected | Inspect screenshots/traces for desktop/mobile, both locales/themes and mobile nav |
+| Exact-head CI | Run 43501211322 passed on `0f6905cb24dcb65ecdf83c2f8a7f009d75ceb59d`; report-only commit below will create a newer PR head | Re-run CI on final documentation head before closing this evidence task |
+| Exact-SHA preview | Run 43501211322 verified alias HTTP 200 and exact marker `0f6905cb24dcb65ecdf83c2f8a7f009d75ceb59d` | Passed for verified source head; final report-only head still needs its own CI run |
+| Visual evidence | 46 screenshots and traces in artifact 14075375001; representative English desktop-dark and Arabic mobile screenshots inspected | Evidence captured; independent editorial/visual sign-off remains open |
 | Mobile RTL overflow | Found at `/ar/writing/document-designmode/` in run 43495874766; CSS fix committed | Re-run exhaustive route suite and inspect fixed screenshot |
-| axe accessibility | axe-core scan added but no result yet | Resolve serious/critical violations; report remaining findings; not WCAG certification |
-| Keyboard/manual accessibility | Automated keyboard test added, pending; no manual screen-reader audit | Execute test and perform manual review |
+| axe contrast | 48 deployed route/theme/device scans in artifact 14075375001; zero violations | Automated contrast gate passed; manual accessibility review remains open |
+| Keyboard/manual accessibility | Automated keyboard/focus tests passed; no manual screen-reader audit | Automated checks passed; manual review remains open |
 | Performance | No Lighthouse/equivalent run | Run Lighthouse or explicitly defer with reason before acceptance |
 | External link integrity | No complete external URL probe | Audit and classify historical destinations separately from internal failures |
 | Canonical/hreflang | Canonical host not confirmed | Product owner must confirm canonical public domain; then add absolute canonical and reciprocal hreflang |
@@ -104,4 +105,4 @@ Arabic copy is implemented across all requested portfolio-owned routes, but no i
 - No invented credentials, metrics, testimonials, employment claims or authorship.
 - No merge of PR #2 or PR #1; no `master` change; no production deployment or production Cloudflare configuration changes.
 
-**Disposition: Phase 2 remains Draft and unaccepted.** A green build alone is insufficient. Acceptance is blocked by exact-head CI/artifact evidence, exact-SHA preview/browser evidence, visual inspection, accessibility/keyboard findings, performance disposition, external-link audit, canonical/hreflang decision, and independent Arabic editorial review.
+**Disposition: Phase 2 remains Draft and unaccepted.** Exact-head CI, isolated preview, deployed browser suite, bilingual visual evidence and automated contrast scans passed on source head `0f6905c`. The report-only commit that follows must receive its own exact-head CI evidence. Remaining product-quality gates include independent Arabic editorial review, manual accessibility/screen-reader review, Lighthouse or equivalent performance assessment, complete external-link audit, and canonical/hreflang decision after the public domain is confirmed. Axe results are not WCAG certification.

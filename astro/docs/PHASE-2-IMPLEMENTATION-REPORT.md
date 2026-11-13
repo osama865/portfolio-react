@@ -4,7 +4,7 @@
 **Repository:** `osama865/portfolio-react`  
 **Branch:** `phase-2/evidence-backed-case-studies`  
 **PR:** [#2 — Draft, open, unmerged](https://github.com/osama865/portfolio-react/pull/2)  
-**Latest application source candidate:** `2bcd69830083a844c22f5aa5660f2b89e2bbc8db`
+**Latest verified application source head:** `0f6905cb24dcb65ecdf83c2f8a7f009d75ceb59d` (run 43501211322)
 
 ## Implemented
 
@@ -38,7 +38,7 @@
 - Existing archive-count assertions remain: 13 projects and 17 writing entries; the homepage still features exactly two case studies.
 - `astro/tests/exhaustive-locale-routes.spec.ts` enumerates all 13 English/Arabic project details and all 17 English/Arabic writing details, plus static editorial routes. It checks route status through navigation, `lang`/`dir`, non-empty page identity/content, route-switch targets, internal route allowlist, metadata and horizontal overflow at desktop/mobile projects.
 - `astro/tests/locale-theme.spec.ts` covers locale semantics, theme state/persistence, unsupported View Transitions, reduced motion, image loading, mobile overflow and keyboard operation.
-- `astro/tests/deployed-preview.spec.ts` verifies exact preview build marker, bilingual desktop/mobile navigation, and captures the requested locale/page visual matrix. It now includes an axe-core WCAG 2.1 A/AA smoke scan on representative English/Arabic routes; this scan has not yet completed successfully in CI.
+- `astro/tests/deployed-preview.spec.ts` verifies exact preview build marker, bilingual desktop/mobile navigation, and captures the requested locale/page visual matrix. Its axe-core scan records full node-level selector/HTML/failure/foreground/background/ratio evidence across 12 English/Arabic routes in both light and dark themes. Reduced-motion emulation stabilizes computed colors during the scan without suppressing any axe rules.
 
 ## CI and evidence
 
@@ -62,19 +62,19 @@
 
 | Area | Evidence/status |
 |---|---|
-| Clean install, dependency audit, Astro diagnostics, production build | Passed on the earlier candidate runs; current exact-head result pending |
-| Exhaustive project/writing routes in both locales | Added; previous run passed desktop route sweep but exposed one mobile overflow; fix committed, rerun pending |
+| Clean install, dependency audit, Astro diagnostics, production build | Passed on exact source head `0f6905c` in run 43501211322 |
+| Exhaustive project/writing routes in both locales | Full local browser suite passed on `0f6905c`; mobile overflow correction verified |
 | Archive counts / featured ranking | 13 projects, 17 writing entries, two featured case studies; third slot remains empty |
-| Theme persistence / reduced motion / unsupported API | Tests added; earlier runs passed relevant reduced-motion/fallback cases; final rerun pending |
-| Keyboard / visible focus | Automated keyboard test added; result pending |
-| axe accessibility | Added to deployed-preview suite; result pending. This is not WCAG certification |
+| Theme persistence / reduced motion / unsupported API | Local suite passed on `0f6905c` |
+| Keyboard / visible focus | Automated keyboard and visible-focus tests passed on `0f6905c`; manual screen-reader review remains open |
+| axe accessibility | 48 deployed route/theme/device scans (12 routes × 2 themes × 2 devices), zero violations; automated scan only, not WCAG certification |
 | Performance / Lighthouse | Not run; remains outstanding |
-| Internal routes/assets | Route allowlist and image checks added; full final run pending |
+| Internal routes/assets | Route allowlist and image checks passed in exact-head local suite |
 | External destinations | Not exhaustively probed; historical external URLs must be treated as references, not assumed-live deployments |
-| Titles/descriptions/Open Graph/Twitter | Implemented and asserted across generated routes; final rerun pending |
+| Titles/descriptions/Open Graph/Twitter | Implemented and asserted across generated routes in the passing local suite |
 | Canonical / hreflang / social image | Not complete; requires approved canonical public domain and social-image asset |
 | Arabic editorial review | Not complete; requires independent fluent Arabic review |
-| Visual inspection | Earlier artifacts inspected; latest bilingual preview matrix and screenshots not yet captured/inspected |
+| Visual inspection | 46 deployed screenshots and traces captured in artifact 14075375001; representative screenshots inspected |
 
 ## Preserved boundaries
 - Exactly two featured case studies remain: INJAZ and Life-Advise. Third slot intentionally empty.
