@@ -11,7 +11,7 @@ test("capture Phase 1.5 visual evidence across themes and destinations", async (
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("A developer,");
   await capture("home-light");
-  await page.getByRole("button", { name: "Toggle light and dark theme" }).click();
+  await page.locator("[data-theme-toggle]").click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await capture("home-dark");
 
