@@ -1,6 +1,6 @@
 # Phase 1.5 visual evidence
 
-The `portfolio-review-evidence` GitHub Actions artifact is the review bundle. It contains local production-preview screenshots, deployed Cloudflare-preview screenshots, the Playwright HTML report, deployed-interaction traces and failure screenshots when present, the npm audit JSON, and this evidence index.
+The `portfolio-review-evidence` GitHub Actions artifact is the review bundle. Screenshots are stored under `visual-evidence/` so the deployed Playwright run cannot clear the local captures when it resets `test-results/`. The artifact also contains the Playwright HTML report, deployed-interaction traces and failure screenshots when present, the npm audit JSON, and this evidence index.
 
 ## Screenshot naming
 
