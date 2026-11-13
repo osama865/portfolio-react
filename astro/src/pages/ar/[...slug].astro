@@ -21,12 +21,12 @@ const isWritingDetail=!!writingItem;
 const categories=[...new Set(projects.map(p=>p.category))];
 const categoryNames:Record<string,string>={"Business platform":"منصة مؤسسية","Progressive web app":"تطبيق ويب تقدّمي","Web application":"تطبيق ويب","Website":"موقع إلكتروني","Portfolio":"معرض أعمال","Experiment":"تجربة"};
 const writingTitles:Record<string,string>={
-"choose-node-framework":"كيف تختار إطار العمل المناسب لتطبيق Node.js القادم؟","node-caching-redis":"موضوعات متقدمة في Node.js: التخزين المؤقت","docker-brief-introduction":"Docker: مقدمة موجزة","life-advise-side-project":"مشروع جانبي: تطبيق Life-Advise","javascript-arrays-iterators":"سلسلة JavaScript 101: المصفوفات وطرقها والمكررات","javascript-scopes-execution-context":"سلسلة JavaScript 101: النطاق وسياق التنفيذ","javascript-functions":"سلسلة JavaScript 101: الدوال","javascript-variables-constants":"سلسلة JavaScript 101: المتغيرات والثوابت والكلمة let","javascript-loops":"سلسلة JavaScript 101: الحلقات التكرارية","free-javascript-resources":"مجموعة مصادر مجانية لتعلم JavaScript وتطوير الويب","conditional-loops-practice":"تدريبات على الشروط والحلقات في JavaScript","javascript-console-time":"ما هي console.time() في JavaScript؟","javascript-conditionals":"سلسلة JavaScript 101: الجمل الشرطية","javascript-syntax-variables-datatypes":"سلسلة JavaScript 101: الصياغة والمتغيرات وأنواع البيانات","javascript-introduction":"سلسلة JavaScript 101: مقدمة","document-designmode":"ما خاصية Document.designMode؟","what-to-write-about":"عمّ أكتب؟"};
+"choose-node-framework":"كيف تختار إطار العمل المناسب لتطبيق Node.js القادم؟","node-caching-redis":"موضوعات متقدمة في Node.js: التخزين المؤقت","docker-brief-introduction":"Docker: مقدمة موجزة","life-advise-side-project":"مشروع جانبي: تطبيق Life-Advise","javascript-arrays-iterators":"سلسلة JavaScript 101: أساليب المصفوفات والمكررات","javascript-scopes-execution-context":"سلسلة JavaScript 101: النطاق وسياق التنفيذ","javascript-functions":"سلسلة JavaScript 101: الدوال","javascript-variables-constants":"سلسلة JavaScript 101: المتغيرات والثوابت والكلمة المفتاحية let","javascript-loops":"سلسلة JavaScript 101: الحلقات التكرارية","free-javascript-resources":"مجموعة مصادر مجانية لتعلم JavaScript وتطوير الويب","conditional-loops-practice":"تدريبات على الشروط والحلقات في JavaScript","javascript-console-time":"ما هي console.time() في JavaScript؟","javascript-conditionals":"سلسلة JavaScript 101: الجمل الشرطية","javascript-syntax-variables-datatypes":"سلسلة JavaScript 101: الصياغة والمتغيرات وأنواع البيانات","javascript-introduction":"سلسلة JavaScript 101: مقدمة","document-designmode":"ما خاصية Document.designMode؟","what-to-write-about":"عمّ أكتب؟"};
 const writingSummaries:Record<string,string>={
 "choose-node-framework":"مقارنة عملية بين أطر عمل Node.js وفق احتياجات التطبيق والمفاضلات والقيود الواقعية للمطوّر.",
 "node-caching-redis":"مقدمة لاستخدام Redis للتخزين المؤقت في تطبيق Node.js، مع مثال عملي ومقارنة لقراءات قاعدة البيانات المتكررة.",
 "docker-brief-introduction":"مدخل للمبتدئين إلى Docker والحاويات والصور والمفاهيم الأساسية لتشغيل التطبيقات داخلها.",
-"life-advise-side-project":"عرض لمشروع Life-Advise واتجاهه للعمل دون اتصال، مع الحفظ المحلي والإشعارات اليومية الاختيارية.",
+"life-advise-side-project":"عرض لمشروع Life-Advise الذي استكشف العمل دون اتصال بالإنترنت، مع حفظ المحتوى محلياً وإتاحة إشعارات يومية اختيارية.",
 "javascript-arrays-iterators":"درس في أساسيات JavaScript يركز على طرق المصفوفات وكيفية التعامل مع مجموعات البيانات.",
 "javascript-scopes-execution-context":"شرح مبسط للنطاق وسياق التنفيذ ضمن سلسلة أساسيات JavaScript.",
 "javascript-functions":"مدخل إلى الدوال ودورها في تنظيم السلوك القابل لإعادة الاستخدام.",
@@ -36,12 +36,12 @@ const writingSummaries:Record<string,string>={
 "conditional-loops-practice":"مادة تدريبية للتعامل مع الجمل الشرطية والحلقات في JavaScript.",
 "javascript-console-time":"شرح قصير للدالة console.time() واستخدام أدوات المطور لقياس زمن التنفيذ.",
 "javascript-conditionals":"دليل تمهيدي للتفرع المنطقي باستخدام if وif/else وswitch.",
-"javascript-syntax-variables-datatypes":"مدخل إلى صياغة JavaScript والمتغيرات وأنواع البيانات للمبتدئين.",
+"javascript-syntax-variables-datatypes":"مدخل إلى قواعد كتابة JavaScript والمتغيرات وأنواع البيانات للمبتدئين.",
 "javascript-introduction":"المقال الافتتاحي في سلسلة أساسيات JavaScript.",
 "document-designmode":"استكشاف لخاصية document.designMode وطريقة غير معتادة لجعل محتوى الصفحة قابلاً للتحرير.",
 "what-to-write-about":"تدوينة تأملية قصيرة حول سؤال: عمّ يمكن أن نكتب؟"
 };
-const writingCategoryNames:Record<string,string>={"Engineering notes":"ملاحظات هندسية","JavaScript notes":"ملاحظات JavaScript","Project notes":"ملاحظات مشروعات","Personal note":"تأملات شخصية","Learning notes":"ملاحظات تعلم"};
+const writingCategoryNames:Record<string,string>={"Engineering notes":"ملاحظات هندسية","JavaScript notes":"ملاحظات JavaScript","Project notes":"ملاحظات عن المشروعات","Personal note":"تأملات شخصية","Learning notes":"ملاحظات تعليمية"};
 const projectNames:Record<string,string>={"injaz":"إنجاز","life-advise":"Life-Advise","netflix-clone":"واجهة Netflix","restaurant-website":"موقع مطعم","amazon-clone":"تصور متجر Amazon","portfolio-legacy":"معرض الأعمال السابق","hotel-room-rental":"استكشاف أماكن الإقامة","chat-room":"غرفة محادثة","galarey":"Galarey","weather-pwa":"تطبيق الطقس","food-recipes-pwa":"تطبيق وصفات الطعام","gym-landing-page":"صفحة نادي رياضي","aos-testing":"تجارب رسوم AOS"};
 const projectDescriptions:Record<string,string>={
 "injaz":"منصة لإدارة شؤون المؤسسة وأعمالها اليومية، تتطور عبر مواصفات واضحة ومسارات عمل قابلة للتحقق.",
