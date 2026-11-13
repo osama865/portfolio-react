@@ -28,7 +28,10 @@ const { title = "Osama Ibrahim — Full-stack developer", description = "I build
     const root = document.documentElement;
     const saved = localStorage.getItem("portfolio-theme");
     if (saved === "dark" || saved === "light") root.dataset.theme = saved;
-    document.querySelector("[data-theme]")?.addEventListener("click", () => {
+    // The root <html> also carries data-theme for CSS state. Target only the explicit control;
+    // a broad [data-theme] selector attaches the handler to <html> and toggles on every bubbled click.
+    document.querySelector("button[data-theme]")?.addEventListener("click", (event) => {
+      event.stopPropagation();
       root.dataset.theme = root.dataset.theme === "dark" ? "light" : "dark";
       localStorage.setItem("portfolio-theme", root.dataset.theme);
     });
