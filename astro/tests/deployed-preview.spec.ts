@@ -3,6 +3,8 @@ import { test, expect } from "@playwright/test";
 const previewUrl = process.env.DEPLOYED_PREVIEW_URL;
 const expectedCommit = process.env.EXPECTED_DEPLOYED_COMMIT;
 
+test.use({ trace: "on" });
+
 test.skip(!previewUrl, "Runs only when the isolated Cloudflare preview URL is supplied.");
 
 test("deployed Astro preview serves the exact verified commit", async ({ page }) => {
