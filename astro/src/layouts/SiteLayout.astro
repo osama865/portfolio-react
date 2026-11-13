@@ -18,7 +18,7 @@ const { title = "Osama Ibrahim — Full-stack developer", description = "I build
 <body>
   <header class="site-header"><div class="container nav-wrap">
     <a class="brand" href="/"><b>OI<span>.</span></b><small>OSAMA IBRAHIM</small></a>
-    <nav data-nav aria-label="Main navigation"><a href="/">Home</a><a href="/projects/">Projects</a><a href="/about/">About</a><a href="/approach/">How I work</a><a href="/contact/">Contact</a></nav>
+    <nav data-nav aria-label="Main navigation"><a href="/">Home</a><a href="/projects/">Work</a><a href="/writing/">Writing</a><a href="/about/">About</a><a href="/approach/">How I work</a><a href="/contact/">Contact</a></nav>
     <button class="theme-button" data-theme aria-label="Toggle light and dark theme">◐</button>
     <button class="menu-button" aria-label="Toggle navigation" aria-expanded="false" data-menu>☰</button>
   </div></header>
@@ -39,6 +39,19 @@ const { title = "Osama Ibrahim — Full-stack developer", description = "I build
       menuButton.setAttribute("aria-expanded", String(!open));
       nav?.classList.toggle("open", !open);
     });
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const revealItems = document.querySelectorAll("[data-reveal]");
+    if (!reduceMotion && "IntersectionObserver" in window) {
+      const observer = new IntersectionObserver((entries, instance) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            instance.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: "0px 0px -32px 0px" });
+      revealItems.forEach((item) => { item.classList.add("reveal-pending"); observer.observe(item); });
+    }
   </script>
 </body>
 </html>

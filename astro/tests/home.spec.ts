@@ -1,9 +1,9 @@
 import { test, expect } from "@playwright/test";
 test("homepage renders styled hero and selected projects", async ({ page }, info) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("complex things");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("A developer,");
   await expect(page.getByRole("link", { name: /explore my work/i })).toBeVisible();
-  await expect(page.getByRole("heading", { name: /projects with a purpose/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /things made to be useful/i })).toBeVisible();
   await expect(page.locator(".site-header")).toHaveCSS("position", "sticky");
   await expect(page.locator(".hero-grid")).toHaveCSS("display", "grid");
   await expect(page.locator("body")).toHaveCSS("font-family", /IBM Plex Sans/);
