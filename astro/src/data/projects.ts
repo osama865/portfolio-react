@@ -1,7 +1,12 @@
-export const projects = [
+export interface Project {
+  slug: string; name: string; category: string; status: string; image: string;
+  description: string; stack: string[]; source?: string; live?: string;
+  reference?: string; featured?: boolean;
+}
+export const projects: Project[] = [
   { slug:"injaz", name:"INJAZ | إنجاز", category:"Business platform", status:"In development", image:"/assets/alsir.png", description:"An organizational management platform focused on clear responsibilities, accountable workflows and practical administration.", stack:["TypeScript","Supabase","PostgreSQL"], featured:true },
   { slug:"life-advise", name:"Life-Advise", category:"Progressive web app", status:"Historical · recovery in progress", image:"/assets/life.png", description:"An offline-first advice and quotes experience designed to remain useful when connectivity is limited.", stack:["JavaScript","PWA","IndexedDB"], source:"https://github.com/osama865/life-advice-client", live:"https://life-advise.pages.dev", featured:true },
-  { slug:"netflix-clone", name:"Netflix interface", category:"Web application", status:"Historical project", image:"/assets/netflix.png", description:"A streaming catalogue interface with film and series discovery, built with React and Firebase.", stack:["React","Firebase"], source:"https://o-netflix.pages.dev", live:"https://os-netflix.pages.dev", featured:true },
+  { slug:"netflix-clone", name:"Netflix interface", category:"Web application", status:"Historical project", image:"/assets/netflix.png", description:"A streaming catalogue interface with film and series discovery, built with React and Firebase.", stack:["React","Firebase"], reference:"https://o-netflix.pages.dev", live:"https://os-netflix.pages.dev", featured:true },
   { slug:"restaurant-website", name:"Restaurant website", category:"Website", status:"Historical project", image:"/assets/restaurant.png", description:"A restaurant website concept with menu, about, gallery and contact sections.", stack:["HTML","CSS","JavaScript"], source:"https://github.com/osama865/assemble-rest", live:"https://assemble-res.pages.dev" },
   { slug:"amazon-clone", name:"Amazon storefront concept", category:"Web application", status:"Historical project", image:"/assets/amazon.png", description:"An early e-commerce interface experiment built with React and Firebase.", stack:["React","Firebase"], source:"https://github.com/osama865/Amazon", live:"https://o-amzn.pages.dev" },
   { slug:"portfolio-legacy", name:"Personal portfolio · legacy", category:"Portfolio", status:"Legacy version", image:"/assets/portoflio.png", description:"The earlier React portfolio, retained as a separate legacy experience.", stack:["React","Create React App"], source:"https://github.com/osama865/portfolio-react", live:"https://o-portfolio.pages.dev" },
@@ -12,5 +17,5 @@ export const projects = [
   { slug:"food-recipes-pwa", name:"Food recipes PWA", category:"Progressive web app", status:"Historical project", image:"/assets/food.png", description:"A lightweight app concept for saving recipes and sharing them with friends.", stack:["JavaScript","PWA"], source:"https://github.com/osama865/PWA_FOOD_APP", live:"https://o-food.pages.dev" },
   { slug:"gym-landing-page", name:"Gym landing page", category:"Website", status:"Historical project", image:"/assets/gym.png", description:"A landing page concept for a fitness business.", stack:["HTML","CSS","JavaScript"], source:"https://github.com/osama865/GYM", live:"https://o-gym.pages.dev" },
   { slug:"aos-testing", name:"AOS animation tests", category:"Experiment", status:"Historical project", image:"/assets/aos.png", description:"A small site exploring scroll animations provided by the AOS library.", stack:["JavaScript","AOS"], live:"https://aos-testing.pages.dev" }
-] as const;
-export const featuredProjects = projects.filter((project) => "featured" in project && project.featured);
+];
+export const featuredProjects = projects.filter((project) => project.featured);
