@@ -7,6 +7,12 @@ async function currentTheme(page: import("@playwright/test").Page) {
 test("ordinary page content clicks never change the theme", async ({ page }) => {
   await page.goto("/");
   const before = await currentTheme(page);
+  await page.evaluate(() => {
+    let changes = 0;
+    const observer = new MutationObserver(() => { changes += 1; });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    (window as typeof window & { __themeChanges?: () => number }).__themeChanges = () => changes;
+  });
   await page.locator(".hero-quote").click();
   await page.locator(".hero-intro p").click();
   await page.locator(".intro-band").click();
@@ -14,6 +20,7 @@ test("ordinary page content clicks never change the theme", async ({ page }) => 
   await page.locator(".hero-bottom").click();
   await page.locator(".site-footer .footer-wrap").click();
   expect(await currentTheme(page)).toBe(before);
+  expect(await page.evaluate(() => (window as typeof window & { __themeChanges?: () => number }).__themeChanges?.() ?? 0)).toBe(0);
   expect(await page.locator("button[data-theme-toggle]").count()).toBe(1);
   expect(await page.locator("button[data-theme]").count()).toBe(0);
 });
@@ -67,6 +74,7 @@ test("the explicit theme switch changes the theme exactly once per activation", 
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   await expect(control).toHaveAttribute("aria-pressed", "false");
   expect(await page.evaluate(() => localStorage.getItem("portfolio-theme"))).toBe("light");
+  await expect.poll(() => page.evaluate(() => (window as typeof window & { __themeChanges?: () => number }).__themeChanges?.() ?? 0)).toBe(2);
 });
 
 test("the selected theme persists across internal navigation and reload", async ({ page }, info) => {
@@ -85,6 +93,7 @@ test("the selected theme persists across internal navigation and reload", async 
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await expect(page.locator("button[data-theme-toggle]")).toHaveAttribute("aria-pressed", "false");
 });
 
 test("both themes retain visible content and distinct foreground/background colors", async ({ page }) => {
