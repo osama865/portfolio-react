@@ -36,7 +36,15 @@ export const routePairs: Record<string, string> = {
 export function counterpart(pathname: string, locale: Locale): string {
   if (locale === "ar") {
     const english = Object.entries(routePairs).find(([, ar]) => ar === pathname)?.[0];
-    return english ?? "/";
+    if (english) return english;
+    const project = pathname.match(/^\\/ar\\/projects\\/([^/]+)\\/$/);
+    if (project) return [ "injaz", "life-advise" ].includes(project[1]) ? `/projects/${project[1]}/` : `/projects/${project[1]}/`;
+    const writing = pathname.match(/^\\/ar\\/writing\\/([^/]+)\\/$/);
+    if (writing) return `/writing/${writing[1]}/`;
+    return "/";
   }
-  return routePairs[pathname] ?? "/ar/";
+  if (routePairs[pathname]) return routePairs[pathname];
+  if (/^\\/projects\\/[^/]+\\/$/.test(pathname)) return `/ar${pathname}`;
+  if (/^\\/writing\\/[^/]+\\/$/.test(pathname)) return `/ar${pathname}`;
+  return "/ar/";
 }
