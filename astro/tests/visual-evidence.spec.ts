@@ -5,7 +5,7 @@ test("capture Phase 1.5 visual evidence across themes and destinations", async (
   const device = info.project.name.startsWith("mobile") ? "mobile" : "desktop";
   const capture = async (name: string) => {
     await page.evaluate(() => document.fonts.ready);
-    await page.screenshot({ path: `test-results/evidence/${device}-${name}.png`, fullPage: true });
+    await page.screenshot({ path: `test-results/evidence/local-${device}-${name}.png`, fullPage: true });
   };
 
   await page.goto("/");
@@ -14,6 +14,10 @@ test("capture Phase 1.5 visual evidence across themes and destinations", async (
   await page.getByRole("button", { name: "Toggle light and dark theme" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await capture("home-dark");
+
+  await page.goto("/projects/");
+  await expect(page.locator(".project-card")).toHaveCount(13);
+  await capture("work-archive");
 
   await page.goto("/writing/");
   await expect(page.locator(".writing-entry")).toHaveCount(17);
@@ -27,9 +31,22 @@ test("capture Phase 1.5 visual evidence across themes and destinations", async (
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await capture("about");
 
+  await page.goto("/approach/");
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  await capture("engineering-approach");
+
   await page.goto("/projects/injaz/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("INJAZ");
-  await capture("project-detail");
+  await capture("project-case-study");
+
+  if (device === "mobile") {
+    await page.goto("/");
+    const menu = page.getByRole("button", { name: "Toggle navigation" });
+    await menu.click();
+    await expect(menu).toHaveAttribute("aria-expanded", "true");
+    await expect(page.getByRole("navigation", { name: "Main navigation" }).getByRole("link", { name: "Work" })).toBeVisible();
+    await capture("mobile-navigation-open");
+  }
 });
 
 test("dark theme keeps text and surfaces distinct", async ({ page }) => {
