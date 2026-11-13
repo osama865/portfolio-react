@@ -16,11 +16,15 @@ test("deployed Astro preview changes theme only through its explicit switch", as
   await page.locator(".hero-quote").click();
   await page.locator(".hero-intro p").click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", initial!);
+  await page.locator('nav a[href="/about/"]').click();
+  await expect(page).toHaveURL(route("/about/"));
+  await expect(page.locator("html")).toHaveAttribute("data-theme", initial!);
 
   // Project-card navigation and filter buttons are not theme controls.
   await page.goto(route("/projects/"));
   await page.getByRole("button", { name: "Website", exact: true }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", initial!);
+  await page.getByRole("button", { name: "All", exact: true }).click();
   await page.locator(".project-card .project-cover").first().click();
   await expect(page).toHaveURL(/\/projects\/[^/]+\/$/);
   await expect(page.locator("html")).toHaveAttribute("data-theme", initial!);
