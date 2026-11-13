@@ -62,10 +62,13 @@ test("the explicit theme switch changes the theme exactly once per activation", 
   expect(await page.evaluate(() => localStorage.getItem("portfolio-theme"))).toBe("light");
 });
 
-test("the selected theme persists across internal navigation and reload", async ({ page }) => {
+test("the selected theme persists across internal navigation and reload", async ({ page }, info) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Toggle light and dark theme" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  if (info.project.name.startsWith("mobile")) {
+    await page.getByRole("button", { name: "Toggle navigation" }).click();
+  }
   await page.getByRole("link", { name: "Writing", exact: true }).click();
   await expect(page).toHaveURL("/writing/");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
