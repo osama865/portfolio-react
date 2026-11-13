@@ -5,7 +5,7 @@ test("capture Phase 1.5 visual evidence across themes and destinations", async (
   const device = info.project.name.startsWith("mobile") ? "mobile" : "desktop";
   const capture = async (name: string) => {
     await page.evaluate(() => document.fonts.ready);
-    await page.screenshot({ path: `test-results/evidence/local-${device}-${name}.png`, fullPage: true });
+    await page.screenshot({ path: `visual-evidence/local-${device}-${name}.png`, fullPage: true });
   };
 
   await page.goto("/");
