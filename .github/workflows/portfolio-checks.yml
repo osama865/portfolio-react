@@ -36,6 +36,6 @@ jobs:
         with:
           name: portfolio-browser-evidence
           path: |
-            astro/test-results/
-            astro/playwright-report/
+            test-results/
+            playwright-report/
           if-no-files-found: ignore
