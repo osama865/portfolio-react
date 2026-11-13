@@ -4,7 +4,7 @@ export interface WritingItem {
   date: string;
   dateISO: string;
   platform: "Medium" | "DEV";
-  category: "Engineering notes" | "JavaScript notes" | "Project notes" | "Personal note";
+  category: "Engineering notes" | "JavaScript notes" | "Project notes" | "Personal note" | "Learning notes";
   summary: string;
   tags: string[];
   url: string;
