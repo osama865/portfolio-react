@@ -4,7 +4,7 @@ test("writing archive presents verified entries and category filters", async ({ 
   await page.goto("/writing/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Some ideas deserve");
   await expect(page.locator(".writing-entry")).toHaveCount(17);
-  await expect(page.getByRole("link", { name: /How To Choose The Right Framework/ })).toBeVisible();
+  await expect(page.locator(".writing-main h2 a", { hasText: /How To Choose The Right Framework/ })).toBeVisible();
   await page.getByRole("button", { name: "Personal note" }).click();
   await expect(page.locator(".writing-entry:visible")).toHaveCount(1);
   await expect(page.locator(".writing-entry:visible h2")).toContainText("what to write about");
