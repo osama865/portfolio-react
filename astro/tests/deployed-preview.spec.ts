@@ -95,7 +95,7 @@ test("capture English and Arabic visual matrix on deployed preview", async ({ pa
   }
 });
 
-test("axe accessibility smoke scan covers representative English and Arabic routes", async ({ page }, info) => {
+test("axe accessibility smoke scan covers representative English and Arabic routes in both themes", async ({ page }, info) => {
   const device = info.project.name.startsWith("mobile") ? "mobile" : "desktop";
   const routes = [
     ["/", "en-home"],
@@ -111,33 +111,61 @@ test("axe accessibility smoke scan covers representative English and Arabic rout
     ["/writing/choose-node-framework/", "en-writing-entry"],
     ["/ar/writing/choose-node-framework/", "ar-writing-entry"]
   ] as const;
-  const reports: Array<{ route: string; violations: Array<{ id: string; impact: string | null; description: string; nodes: number }> }> = [];
+  const reports: Array<{ route: string; theme: string; violations: unknown[]; incomplete: unknown[] }> = [];
 
   for (const [path, name] of routes) {
     await page.goto(route(path));
     await page.addScriptTag({ url: "https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js" });
-    const result = await page.evaluate(async () => {
-      const axe = (window as any).axe;
-      return axe.run(document, {
-        runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] }
+    for (const theme of ["light", "dark"] as const) {
+      const current = await page.locator("html").getAttribute("data-theme");
+      if (current !== theme) await page.locator("[data-theme-toggle]").click();
+      await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+      const result = await page.evaluate(async () => {
+        const axe = (window as any).axe;
+        return axe.run(document, {
+          runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] }
+        });
       });
-    });
-    reports.push({
-      route: path,
-      violations: result.violations.map((violation: any) => ({
+      const violations = result.violations.map((violation: any) => ({
         id: violation.id,
         impact: violation.impact ?? null,
         description: violation.description,
-        nodes: violation.nodes.length
-      }))
-    });
-    console.log(`AXE ${device} ${name}: ${result.violations.length} violations`);
+        help: violation.help,
+        helpUrl: violation.helpUrl,
+        nodes: violation.nodes.map((node: any) => ({
+          target: node.target,
+          html: node.html,
+          failureSummary: node.failureSummary,
+          any: node.any.map((check: any) => ({
+            id: check.id,
+            message: check.message,
+            data: check.data,
+            relatedNodes: check.relatedNodes
+          })),
+          all: node.all.map((check: any) => ({
+            id: check.id,
+            message: check.message,
+            data: check.data,
+            relatedNodes: check.relatedNodes
+          })),
+          none: node.none.map((check: any) => ({
+            id: check.id,
+            message: check.message,
+            data: check.data,
+            relatedNodes: check.relatedNodes
+          }))
+        }))
+      }));
+      reports.push({ route: path, theme, violations, incomplete: result.incomplete });
+      console.log(`AXE ${device} ${theme} ${name}: ${result.violations.length} violations`);
+    }
   }
 
   mkdirSync("test-results", { recursive: true });
   writeFileSync(`test-results/axe-${device}-report.json`, JSON.stringify(reports, null, 2));
-  const serious = reports.flatMap(report => report.violations
-    .filter(violation => violation.impact === "serious" || violation.impact === "critical")
-    .map(violation => ({ route: report.route, ...violation })));
+  const serious = reports.flatMap(report => report.violations.flatMap((violation: any) =>
+    (violation.impact === "serious" || violation.impact === "critical")
+      ? [{ route: report.route, theme: report.theme, id: violation.id, impact: violation.impact, nodes: violation.nodes }]
+      : []));
   expect(serious, JSON.stringify(serious, null, 2)).toEqual([]);
 });
