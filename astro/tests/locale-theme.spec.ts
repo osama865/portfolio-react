@@ -57,6 +57,7 @@ test("Arabic archive retains all project records and filter interaction", async 
 
 test("theme control exposes the action icon and synchronized state in both locales", async ({ page }) => {
   for (const route of ["/", "/ar/"]) {
+    await page.evaluate(() => localStorage.removeItem("portfolio-theme"));
     await page.goto(route);
     const button = page.locator("[data-theme-toggle]");
     await expect(button).toHaveAttribute("aria-pressed", "false");
@@ -94,7 +95,12 @@ test("Arabic case-study pages have no broken local images or horizontal overflow
     const errors: string[] = [];
     page.on("pageerror", error => errors.push(error.message));
     await page.goto(route);
-    const broken = await page.locator("img").evaluateAll(images => (images as HTMLImageElement[]).filter(img => !img.complete || img.naturalWidth === 0).map(img => img.src));
+    const broken = await page.locator("img").evaluateAll(async images => {
+      const elements = images as HTMLImageElement[];
+      elements.forEach(img => { img.loading = "eager"; });
+      await Promise.all(elements.map(img => img.decode().catch(() => undefined)));
+      return elements.filter(img => !img.complete || img.naturalWidth === 0).map(img => img.src);
+    });
     expect(broken, route).toEqual([]);
     const dimensions = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, client: document.documentElement.clientWidth }));
     expect(dimensions.scroll, route).toBeLessThanOrEqual(dimensions.client + 1);
