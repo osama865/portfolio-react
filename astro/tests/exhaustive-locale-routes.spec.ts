@@ -26,10 +26,10 @@ test("every generated English and Arabic route renders, switches locale, and pre
       await expect(page.locator("main")).not.toBeEmpty();
       await expect(page).toHaveTitle(/.+/);
       await expect(page.locator("meta[name=description]")).toHaveAttribute("content", /.+/);
-      await expect(page.locator("meta[property="og:title"]")).toHaveAttribute("content", /.+/);
-      await expect(page.locator("meta[property="og:description"]")).toHaveAttribute("content", /.+/);
-      await expect(page.locator("meta[property="og:locale"]")).toHaveAttribute("content", locale === "ar" ? "ar_AR" : "en_US");
-      await expect(page.locator("meta[name="twitter:card"]")).toHaveAttribute("content", "summary");
+      await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", /.+/);
+      await expect(page.locator('meta[property="og:description"]')).toHaveAttribute("content", /.+/);
+      await expect(page.locator('meta[property="og:locale"]')).toHaveAttribute("content", locale === "ar" ? "ar_AR" : "en_US");
+      await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute("content", "summary");
 
       const pageText = (await page.locator("main").innerText()).trim();
       expect(pageText.length, route).toBeGreaterThan(80);
