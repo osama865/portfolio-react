@@ -115,6 +115,7 @@ jobs:
           name: portfolio-review-evidence
           path: |
             astro/test-results/
+            astro/visual-evidence/
             astro/playwright-report/
             astro/npm-audit.json
             astro/package-lock.json
