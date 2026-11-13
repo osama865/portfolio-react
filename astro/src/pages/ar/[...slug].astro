@@ -3,7 +3,7 @@ import SiteLayout from "../../layouts/SiteLayout.astro";
 import { projects } from "../../data/projects";
 import { writing } from "../../data/writing";
 export function getStaticPaths() {
-  return ["projects","projects/injaz","projects/life-advise","about","approach","contact","writing"].map((slug)=>({params:{slug:slug.split("/")},props:{slug}}));
+  return ["projects","projects/injaz","projects/life-advise","about","approach","contact","writing"].map((slug)=>({params:{slug},props:{slug}}));
 }
 const {slug}=Astro.props;
 const isArchive=slug==="projects";
