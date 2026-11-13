@@ -21,14 +21,14 @@ const xmlEscape = (value: string) => value
   .replace(/'/g, "&apos;");
 
 export function GET() {
-  const siteUrl = process.env.PUBLIC_SITE_URL?.replace(/\\/+$/, "");
+  const siteUrl = process.env.PUBLIC_SITE_URL?.replace(/\/+$/, "");
   const indexable = process.env.PUBLIC_SITE_INDEXABLE === "true" && Boolean(siteUrl);
   const urls = indexable
-    ? [...new Set(routes)].map((path) => `  <url><loc>${xmlEscape(new URL(path, siteUrl).href)}</loc></url>`).join("\\n")
+    ? [...new Set(routes)].map((path) => `  <url><loc>${xmlEscape(new URL(path, siteUrl).href)}</loc></url>`).join("\n")
     : "";
 
   return new Response(
-    `<?xml version="1.0" encoding="UTF-8"?>\\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\\n${urls}\\n</urlset>\\n`,
+    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`,
     { headers: { "Content-Type": "application/xml; charset=utf-8" } }
   );
 }
