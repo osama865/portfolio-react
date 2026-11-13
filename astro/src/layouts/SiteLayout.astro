@@ -1,0 +1,43 @@
+---
+import "../styles/global.css";
+const { title = "Osama Ibrahim — Full-stack developer", description = "I build useful, dependable digital products." } = Astro.props;
+---
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content={description} />
+  <meta name="theme-color" content="#f5f7fb" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" href="/favicon.ico" />
+  <title>{title}</title>
+</head>
+<body>
+  <header class="site-header"><div class="container nav-wrap">
+    <a class="brand" href="/"><b>OI<span>.</span></b><small>OSAMA IBRAHIM</small></a>
+    <button class="menu-button" aria-label="Toggle navigation" aria-expanded="false" data-menu>☰</button>
+    <nav data-nav aria-label="Main navigation"><a href="/">Home</a><a href="/projects/">Projects</a><a href="/about/">About</a><a href="/approach/">How I work</a><a href="/contact/">Contact</a><button class="theme-button" data-theme aria-label="Toggle light and dark theme">◐</button></nav>
+  </div></header>
+  <main id="main"><slot /></main>
+  <footer class="site-footer"><div class="container footer-wrap"><a class="brand" href="/"><b>OI<span>.</span></b></a><p>Designed with intent. Built with care.</p><div><a href="https://github.com/osama865" target="_blank" rel="noreferrer">GitHub ↗</a><a href="https://medium.com/@osama1010" target="_blank" rel="noreferrer">Medium ↗</a></div><small>© {new Date().getFullYear()} Osama Ibrahim</small></div></footer>
+  <script>
+    const root = document.documentElement;
+    const saved = localStorage.getItem("portfolio-theme");
+    if (saved === "dark" || saved === "light") root.dataset.theme = saved;
+    document.querySelector("[data-theme]")?.addEventListener("click", () => {
+      root.dataset.theme = root.dataset.theme === "dark" ? "light" : "dark";
+      localStorage.setItem("portfolio-theme", root.dataset.theme);
+    });
+    const menuButton = document.querySelector("[data-menu]");
+    const nav = document.querySelector("[data-nav]");
+    menuButton?.addEventListener("click", () => {
+      const open = menuButton.getAttribute("aria-expanded") === "true";
+      menuButton.setAttribute("aria-expanded", String(!open));
+      nav?.classList.toggle("open", !open);
+    });
+  </script>
+</body>
+</html>
