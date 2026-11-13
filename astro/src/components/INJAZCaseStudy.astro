@@ -1,0 +1,38 @@
+---
+---
+<section class="case-study">
+  <p class="eyebrow">FEATURED CASE STUDY / PRODUCT OWNERSHIP & DELIVERY</p>
+  <h2>Turning organisational operations into a product with explicit rules.</h2>
+  <p>INJAZ (إنجاز) is an organisational management platform intended to help an organisation manage people, responsibilities and recurring operational work through one coherent system. Its product direction is shaped by a practical question: can normal administration be carried out reliably by the organisation itself, without routine developer intervention?</p>
+  <div class="case-meta"><span>Product in development</span><span>Private source repository</span><span>Evidence reviewed 13 Nov 2026</span></div>
+  <h3>Product context</h3>
+  <p>The approved V1 scope covers employee identity and lifecycle, departments and roles, daily reports, financial claims, missions, quarterly reporting, announcements, configuration, data portability, PWA behaviour and recovery. The intended users and permissions are defined by the product specifications rather than inferred from interface labels. For example, the approved identity specification separates Admin authority from an HoD's organisational function.</p>
+  <h3>Product ownership is part of the engineering</h3>
+  <p>The work is organised around controlled requirements, stable scenario IDs, explicit decisions and workstream gates. The Product Owner defines the problem, scope and acceptance expectations; implementation and technical proposals are evaluated against those decisions. A passed security workstream is not treated as acceptance of the whole product. Unresolved issues remain visible and assigned to their owning workstream.</p>
+  <h3>Architecture at a glance</h3>
+  <p>The following is a source-informed system-boundary illustration, not a screenshot or a claim that every V1 capability is complete.</p>
+  <div class="diagram" role="img" aria-label="INJAZ architecture: organisational users interact with the browser application; authenticated requests cross Supabase Auth and trusted Edge Function or RPC boundaries; PostgreSQL stores records and RLS enforces data access; CI and review evidence verify selected paths.">
+    <div class="diagram-node"><b>People & roles</b><small>Admin · HoD · Employee</small></div><div class="diagram-arrow">↓</div>
+    <div class="diagram-node"><b>Web application</b><small>Role-aware operational interfaces</small></div><div class="diagram-arrow">↓</div>
+    <div class="diagram-split"><div class="diagram-node"><b>Supabase Auth</b><small>Identity & sessions</small></div><div class="diagram-node"><b>Trusted server boundary</b><small>Edge Functions · RPCs</small></div></div><div class="diagram-arrow">↓</div>
+    <div class="diagram-node"><b>PostgreSQL</b><small>Schema · migrations · RLS policies · audit trail</small></div>
+    <div class="diagram-note">Cross-cutting: disposable CI, pgTAP, Playwright, deployment checks and independent evidence review.</div>
+  </div>
+  <h3>Delivery evidence and current boundary</h3>
+  <ul>
+    <li><b>WS-01:</b> baseline/specification and traceability work established.</li>
+    <li><b>WS-02:</b> deployment foundation has been developed through staged preview work; the current V1 matrix still records production URL/deployment evidence as outstanding.</li>
+    <li><b>WS-03:</b> database, authorisation and security are explicitly accepted on 10 Nov 2026. The acceptance record cites the reviewed code head and four successful CI workflows, migration history, Admin invitation/cancellation audit attribution, public-signup restriction and synthetic-data cleanup. SMTP delivery remained unverified because of provider rate limiting.</li>
+    <li><b>WS-03.5 Stage B:</b> merged implementation includes provisional visual identity assets/tokens. Its exact-head authenticated, public-preview and print/PDF checks passed. The evidence is scoped to those visual and preservation checks, not universal accessibility or full application regression.</li>
+    <li><b>WS-04:</b> the current Gate 1 branch is still under review. PR #21 is Draft and unmerged; its description records focused identity/lifecycle remediations and additional pgTAP, disposable integration and Playwright coverage. It also explicitly lists unresolved expiry-policy, broader lifecycle E2E and cross-spec mission-state questions. Do not call WS-04 accepted.</li>
+  </ul>
+  <p class="evidence"><b>Release status</b><br/>INJAZ remains in development. WS-03 acceptance and WS-03.5 Stage B evidence do not establish V1 release acceptance, production readiness or completion of WS-04 through WS-10. The current requirements matrix still records material work in CSV import, exports, backup/recovery and overall QA.</p>
+  <h3>Operational workflow, not just modules</h3>
+  <div class="workflow" role="img" aria-label="Product delivery workflow from approved specification to implementation, isolated verification, independent review, acceptance or documented carry-forward.">
+    <div>Approved requirements</div><i>→</i><div>Implementation</div><i>→</i><div>Isolated tests & evidence</div><i>→</i><div>Independent review</div><i>→</i><div>Accept or carry forward</div>
+  </div>
+  <p>That final step matters: a failing regression, an incomplete provider check or an unresolved specification conflict is recorded and routed to the right workstream instead of being hidden behind a general progress percentage.</p>
+  <h3>My role</h3>
+  <p>The portfolio presents this as a Product Ownership and engineering-leadership case study: product direction, scope control, requirements and acceptance decisions, prioritisation, evidence review and release governance. Exact personal authorship of individual modules and architecture decisions is intentionally not claimed here without a confirmed attribution record.</p>
+  <div class="case-links"><a class="read-link" href="https://github.com/osama865/IAH" target="_blank" rel="noreferrer">Private source repository (access restricted) ↗</a><a class="read-link" href="/contact/">Discuss the project ↗</a></div>
+</section>

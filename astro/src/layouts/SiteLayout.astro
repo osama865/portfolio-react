@@ -1,14 +1,45 @@
 ---
 import "../styles/global.css";
+import { messages, counterpart, type Locale } from "../i18n/messages";
 const { title = "Osama Ibrahim — Full-stack developer", description = "I build useful, dependable digital products." } = Astro.props;
+const pathname = Astro.url.pathname;
+const locale: Locale = pathname === "/ar" || pathname.startsWith("/ar/") ? "ar" : "en";
+const t = messages[locale];
 const buildCommit = process.env.CF_PAGES_COMMIT_SHA ?? process.env.GITHUB_SHA ?? "local";
+const canonicalBase = Astro.site;
+const englishUrl = canonicalBase ? new URL(locale === "en" ? pathname : counterpart(pathname), canonicalBase).href : undefined;
+const arabicUrl = canonicalBase ? new URL(locale === "ar" ? pathname : counterpart(pathname), canonicalBase).href : undefined;
+const links = [
+  [t.nav.home, locale === "ar" ? "/ar/" : "/"],
+  [t.nav.work, locale === "ar" ? "/ar/projects/" : "/projects/"],
+  [t.nav.writing, locale === "ar" ? "/ar/writing/" : "/writing/"],
+  [t.nav.about, locale === "ar" ? "/ar/about/" : "/about/"],
+  [t.nav.approach, locale === "ar" ? "/ar/approach/" : "/approach/"],
+  [t.nav.contact, locale === "ar" ? "/ar/contact/" : "/contact/"],
+] as const;
 ---
 <!doctype html>
-<html lang="en" data-theme="light" data-build-commit={buildCommit}>
+<html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"} data-theme="light" data-build-commit={buildCommit}>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content={description} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Osama Ibrahim" />
+  <meta property="og:locale" content={locale === "ar" ? "ar_AR" : "en_US"} />
+  <meta property="og:locale:alternate" content={locale === "ar" ? "en_US" : "ar_AR"} />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  {canonicalBase && <>
+    <link rel="canonical" href={locale === "ar" ? arabicUrl : englishUrl} />
+    <link rel="alternate" hreflang="en" href={englishUrl} />
+    <link rel="alternate" hreflang="ar" href={arabicUrl} />
+    <link rel="alternate" hreflang="x-default" href={englishUrl} />
+    <meta property="og:url" content={locale === "ar" ? arabicUrl : englishUrl} />
+  </>}
   <meta name="portfolio-build-commit" content={buildCommit} />
   <meta name="theme-color" content="#f5f7fb" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -19,30 +50,54 @@ const buildCommit = process.env.CF_PAGES_COMMIT_SHA ?? process.env.GITHUB_SHA ??
 </head>
 <body>
   <header class="site-header"><div class="container nav-wrap">
-    <a class="brand" href="/"><b>OI<span>.</span></b><small>OSAMA IBRAHIM</small></a>
-    <nav data-nav aria-label="Main navigation"><a href="/">Home</a><a href="/projects/">Work</a><a href="/writing/">Writing</a><a href="/about/">About</a><a href="/approach/">How I work</a><a href="/contact/">Contact</a></nav>
-    <button class="theme-button" type="button" data-theme-toggle aria-label="Toggle light and dark theme" aria-pressed="false">◐</button>
-    <button class="menu-button" aria-label="Toggle navigation" aria-expanded="false" data-menu>☰</button>
+    <a class="brand" href={locale === "ar" ? "/ar/" : "/"}><b>OI<span>.</span></b><small>OSAMA IBRAHIM</small></a>
+    <nav data-nav aria-label={locale === "ar" ? "التنقل الرئيسي" : "Main navigation"}>{links.map(([label, href]) => <a href={href}>{label}</a>)}</nav>
+    <div class="nav-tools">
+      <a class="language-switch" href={counterpart(pathname)} lang={locale === "ar" ? "en" : "ar"}>{t.language}</a>
+      <button class="theme-button" type="button" data-theme-toggle aria-label={t.themeToDark} aria-pressed="false" title={t.themeToDark}>
+        <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>
+        <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.6 8.6 0 1 0 20.5 14.2Z"/></svg>
+      </button>
+      <button class="menu-button" type="button" aria-label={t.menu} aria-expanded="false" data-menu>☰</button>
+    </div>
   </div></header>
   <main id="main"><slot /></main>
-  <footer class="site-footer"><div class="container footer-wrap"><a class="brand" href="/"><b>OI<span>.</span></b></a><p>Designed with intent. Built with care.</p><div><a href="https://github.com/osama865" target="_blank" rel="noreferrer">GitHub ↗</a><a href="https://medium.com/@osama1010" target="_blank" rel="noreferrer">Medium ↗</a><a href="https://dev.to/osam1010" target="_blank" rel="noreferrer">DEV ↗</a><a href="https://x.com/Osam1010" target="_blank" rel="noreferrer">X ↗</a><a href="https://www.linkedin.com/in/osama-ibrahim-a854841a5/" target="_blank" rel="noreferrer">LinkedIn ↗</a></div><small>© {new Date().getFullYear()} Osama Ibrahim</small></div></footer>
+  <footer class="site-footer"><div class="container footer-wrap"><a class="brand" href={locale === "ar" ? "/ar/" : "/"}><b>OI<span>.</span></b></a><p>{t.footer}</p><div><a href="https://github.com/osama865" target="_blank" rel="noreferrer">GitHub ↗</a><a href="https://medium.com/@osama1010" target="_blank" rel="noreferrer">Medium ↗</a><a href="https://dev.to/osam1010" target="_blank" rel="noreferrer">DEV ↗</a><a href="https://x.com/Osam1010" target="_blank" rel="noreferrer">X ↗</a><a href="https://www.linkedin.com/in/osama-ibrahim-a854841a5/" target="_blank" rel="noreferrer">LinkedIn ↗</a></div><small>© {new Date().getFullYear()} Osama Ibrahim</small></div></footer>
   <script>
     const root = document.documentElement;
+    const themeToggle = document.querySelector<HTMLButtonElement>("[data-theme-toggle]");
+    const locale = root.lang === "ar" ? "ar" : "en";
+    const labels = locale === "ar"
+      ? { dark: "التبديل إلى المظهر الداكن", light: "التبديل إلى المظهر الفاتح" }
+      : { dark: "Switch to dark theme", light: "Switch to light theme" };
+    const syncThemeControl = () => {
+      const dark = root.dataset.theme === "dark";
+      themeToggle?.setAttribute("aria-pressed", String(dark));
+      themeToggle?.setAttribute("aria-label", dark ? labels.light : labels.dark);
+      themeToggle?.setAttribute("title", dark ? labels.light : labels.dark);
+    };
     const saved = localStorage.getItem("portfolio-theme");
     if (saved === "dark" || saved === "light") root.dataset.theme = saved;
-    document.querySelector<HTMLButtonElement>("[data-theme-toggle]")?.setAttribute("aria-pressed", String(root.dataset.theme === "dark"));
-    // The root <html> also carries data-theme for CSS state. Target only the explicit control;
-    // a broad [data-theme] selector attaches the handler to <html> and toggles on every bubbled click.
-    const themeToggle = document.querySelector<HTMLButtonElement>("[data-theme-toggle]");
+    syncThemeControl();
     themeToggle?.addEventListener("click", (event) => {
       event.stopPropagation();
       const nextTheme = root.dataset.theme === "dark" ? "light" : "dark";
-      root.dataset.theme = nextTheme;
-      themeToggle.setAttribute("aria-pressed", String(nextTheme === "dark"));
-      localStorage.setItem("portfolio-theme", nextTheme);
+      const apply = () => {
+        root.dataset.theme = nextTheme;
+        localStorage.setItem("portfolio-theme", nextTheme);
+        syncThemeControl();
+      };
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const supportsTransition = typeof (document as any).startViewTransition === "function" && !reduced;
+      if (supportsTransition) {
+        const button = themeToggle.getBoundingClientRect();
+        root.style.setProperty("--theme-origin-x", `${button.left + button.width / 2}px`);
+        root.style.setProperty("--theme-origin-y", `${button.top + button.height / 2}px`);
+        (document as any).startViewTransition(apply);
+      } else apply();
     });
-    const menuButton = document.querySelector("[data-menu]");
-    const nav = document.querySelector("[data-nav]");
+    const menuButton = document.querySelector<HTMLButtonElement>("[data-menu]");
+    const nav = document.querySelector<HTMLElement>("[data-nav]");
     menuButton?.addEventListener("click", () => {
       const open = menuButton.getAttribute("aria-expanded") === "true";
       menuButton.setAttribute("aria-expanded", String(!open));
@@ -53,10 +108,7 @@ const buildCommit = process.env.CF_PAGES_COMMIT_SHA ?? process.env.GITHUB_SHA ??
     if (!reduceMotion && "IntersectionObserver" in window) {
       const observer = new IntersectionObserver((entries, instance) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-            instance.unobserve(entry.target);
-          }
+          if (entry.isIntersecting) { entry.target.classList.add("is-visible"); instance.unobserve(entry.target); }
         });
       }, { threshold: 0.12, rootMargin: "0px 0px -32px 0px" });
       revealItems.forEach((item) => { item.classList.add("reveal-pending"); observer.observe(item); });

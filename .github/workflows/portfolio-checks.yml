@@ -1,16 +1,16 @@
 name: Astro portfolio checks
 on:
   push:
-    branches: ["phase-1/astro-foundation"]
+    branches: ["phase-1/astro-foundation", "phase-2/evidence-backed-case-studies"]
     paths: ["astro/**", ".github/workflows/portfolio-checks.yml"]
   pull_request:
-    branches: [master]
+    branches: [master, "phase-1/astro-foundation"]
     paths: ["astro/**", ".github/workflows/portfolio-checks.yml"]
   workflow_dispatch:
 permissions:
   contents: read
 concurrency:
-  group: portfolio-${{ github.head_ref || github.ref_name }}
+  group: portfolio-${{ github.event_name }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 jobs:
   verify:
@@ -52,11 +52,49 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Browser tests and responsive screenshots
         run: npm run test:e2e
+      - name: Validate deployed-preview event and branch matrix
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF: ${{ github.ref }}
+          PR_BASE: ${{ github.event.pull_request.base.ref }}
+        run: |
+          node --input-type=module <<'NODE'
+          const previewEnabled = (event, ref, base) =>
+            (event === 'push' && ref === 'refs/heads/phase-1/astro-foundation') ||
+            (event === 'push' && ref === 'refs/heads/phase-2/evidence-backed-case-studies') ||
+            (event === 'pull_request' && ref === 'refs/pull/2/merge' && base === 'phase-1/astro-foundation') ||
+            (event === 'workflow_dispatch' && ref === 'refs/heads/phase-1/astro-foundation') ||
+            (event === 'pull_request' && base === 'master');
+          const cases = [
+            ['Phase 2 push', 'push', 'refs/heads/phase-2/evidence-backed-case-studies', '', true],
+            ['PR #2 to Phase 1', 'pull_request', 'refs/pull/2/merge', 'phase-1/astro-foundation', true],
+            ['Phase 1.5 push', 'push', 'refs/heads/phase-1/astro-foundation', '', true],
+            ['Phase 1.5 manual dispatch', 'workflow_dispatch', 'refs/heads/phase-1/astro-foundation', '', true],
+            ['PR to master', 'pull_request', 'refs/heads/topic', 'master', true],
+            ['Phase 2 manual dispatch', 'workflow_dispatch', 'refs/heads/phase-2/evidence-backed-case-studies', '', false],
+            ['master push', 'push', 'refs/heads/master', '', false]
+          ];
+          for (const [label, event, ref, base, expected] of cases) {
+            const actual = previewEnabled(event, ref, base);
+            if (actual !== expected) throw new Error(`${label}: expected preview=${expected}, got ${actual}`);
+            console.log(`PASS ${label}: preview=${actual}`);
+          }
+          const actualEvent = process.env.EVENT_NAME;
+          const actualRef = process.env.REF;
+          const actualBase = process.env.PR_BASE;
+          console.log('Current run preview eligibility:', previewEnabled(actualEvent, actualRef, actualBase));
+          NODE
       - name: Wait for the exact commit on the isolated Cloudflare preview
+        if: |
+          (github.event_name == 'push' && github.ref == 'refs/heads/phase-2/evidence-backed-case-studies') ||
+          (github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'phase-2/evidence-backed-case-studies' && github.event.pull_request.base.ref == 'phase-1/astro-foundation') ||
+          (github.event_name == 'push' && github.ref == 'refs/heads/phase-1/astro-foundation') ||
+          (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/phase-1/astro-foundation') ||
+          (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'master')
         id: preview
         env:
           EXPECTED_PREVIEW_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-          PREVIEW_URL: https://osama-portfolio-preview.pages.dev
+          PREVIEW_URL: ${{ (github.ref == 'refs/heads/phase-2/evidence-backed-case-studies' || github.event.pull_request.head.ref == 'phase-2/evidence-backed-case-studies') && 'https://phase-2-evidence-backed-case.osama-portfolio-preview.pages.dev' || 'https://osama-portfolio-preview.pages.dev' }}
         run: |
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
@@ -94,10 +132,26 @@ jobs:
           process.exit(1);
           NODE
       - name: Verify theme interactions and visual evidence on deployed preview
+        if: |
+          (github.event_name == 'push' && github.ref == 'refs/heads/phase-2/evidence-backed-case-studies') ||
+          (github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'phase-2/evidence-backed-case-studies' && github.event.pull_request.base.ref == 'phase-1/astro-foundation') ||
+          (github.event_name == 'push' && github.ref == 'refs/heads/phase-1/astro-foundation') ||
+          (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/phase-1/astro-foundation') ||
+          (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'master')
         env:
           DEPLOYED_PREVIEW_URL: ${{ steps.preview.outputs.url }}
           EXPECTED_DEPLOYED_COMMIT: ${{ steps.preview.outputs.commit }}
         run: npm run test:preview
+      - name: Lighthouse production-preview assessment
+        if: |
+          (github.event_name == 'push' && github.ref == 'refs/heads/phase-2/evidence-backed-case-studies') ||
+          (github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'phase-2/evidence-backed-case-studies' && github.event.pull_request.base.ref == 'phase-1/astro-foundation')
+        env:
+          DEPLOYED_PREVIEW_URL: ${{ steps.preview.outputs.url }}
+        run: |
+          mkdir -p lighthouse
+          npx --yes lighthouse@12.8.2 "$DEPLOYED_PREVIEW_URL" --chrome-flags="--headless --no-sandbox" --only-categories=performance,accessibility,best-practices,seo --output=json --output-path=lighthouse/mobile.json
+          npx --yes lighthouse@12.8.2 "$DEPLOYED_PREVIEW_URL" --preset=desktop --chrome-flags="--headless --no-sandbox" --only-categories=performance,accessibility,best-practices,seo --output=json --output-path=lighthouse/desktop.json
       - name: Confirm dependency manifests remain unchanged
         run: git diff --exit-code HEAD -- package.json package-lock.json
       - name: Publish visual evidence index to job summary
@@ -121,4 +175,5 @@ jobs:
             astro/package-lock.json
             astro/docs/PHASE-1.5-VISUAL-EVIDENCE.md
             astro/preview-readiness.json
+            astro/lighthouse/
           if-no-files-found: ignore

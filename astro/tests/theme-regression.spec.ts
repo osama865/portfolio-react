@@ -89,7 +89,7 @@ test("the selected theme persists across internal navigation and reload", async 
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  await page.getByRole("button", { name: "Toggle light and dark theme" }).click();
+  await page.locator("[data-theme-toggle]").click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
@@ -100,7 +100,7 @@ test("both themes retain visible content and distinct foreground/background colo
   await page.goto("/");
   for (const selected of ["light", "dark"] as const) {
     if (await currentTheme(page) !== selected) {
-      await page.getByRole("button", { name: "Toggle light and dark theme" }).click();
+      await page.locator("[data-theme-toggle]").click();
     }
     await expect(page.locator("html")).toHaveAttribute("data-theme", selected);
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();

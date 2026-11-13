@@ -3,7 +3,9 @@ test("homepage renders styled hero and selected projects", async ({ page }, info
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("A developer,");
   await expect(page.getByRole("link", { name: /explore the work/i })).toBeVisible();
-  await expect(page.getByRole("heading", { name: /things made to be useful/i })).toBeVisible();
+  await expect(page.locator(".featured-case")).toHaveCount(2);
+  await expect(page.locator(".featured-case").nth(0)).toContainText("INJAZ");
+  await expect(page.locator(".featured-case").nth(1)).toContainText("Life-Advise");
   await expect(page.locator(".site-header")).toHaveCSS("position", "sticky");
   await expect(page.locator(".editorial-hero-grid")).toHaveCSS("display", "grid");
   await expect(page.locator("body")).toHaveCSS("font-family", /IBM Plex Sans/);
@@ -15,7 +17,7 @@ test("homepage renders styled hero and selected projects", async ({ page }, info
 test("theme toggle changes the document theme", async ({ page }) => {
   await page.goto("/");
   const before = await page.locator("html").getAttribute("data-theme");
-  await page.getByRole("button", { name: "Toggle light and dark theme" }).click();
+  await page.getByRole("button", { name: "Switch to dark theme" }).click();
   await expect(page.locator("html")).not.toHaveAttribute("data-theme", before ?? "light");
 });
 test("mobile navigation opens and reaches projects", async ({ page }, info) => {
