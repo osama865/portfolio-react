@@ -44,7 +44,7 @@ test("capture Phase 1.5 visual evidence across themes and destinations", async (
     const menu = page.getByRole("button", { name: "Toggle navigation" });
     await menu.click();
     await expect(menu).toHaveAttribute("aria-expanded", "true");
-    await expect(page.getByRole("navigation", { name: "Main navigation" }).getByRole("link", { name: "Work" })).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "Main navigation" }).getByRole("link", { name: "Work", exact: true })).toBeVisible();
     await capture("mobile-navigation-open");
   }
 });
