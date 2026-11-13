@@ -8,7 +8,7 @@ export const messages = {
   },
   ar: {
     nav: { home: "الرئيسية", work: "الأعمال", writing: "الكتابة", about: "نبذة", approach: "منهجي في العمل", contact: "تواصل" },
-    footer: "صُمّم بقصد، وبُني بعناية.",
+    footer: "تصميم مدروس، وتنفيذ بعناية.",
     language: "English", themeToDark: "التبديل إلى المظهر الداكن", themeToLight: "التبديل إلى المظهر الفاتح", menu: "فتح أو إغلاق قائمة التنقل",
   },
 } as const satisfies Record<Locale, {
