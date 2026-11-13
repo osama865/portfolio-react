@@ -16,7 +16,7 @@ test("deployed Astro preview serves the exact verified commit", async ({ page })
   }
 });
 
-test("deployed Astro preview changes theme only through its explicit switch", async ({ page }) => {
+test("deployed Astro preview changes theme only through its explicit switch", async ({ page }, info) => {
   const origin = previewUrl!;
   const route = (path: string) => new URL(path, origin).toString();
   await page.goto(origin);
@@ -28,6 +28,9 @@ test("deployed Astro preview changes theme only through its explicit switch", as
   await page.locator(".hero-quote").click();
   await page.locator(".hero-intro p").click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", initial!);
+  if (info.project.name.startsWith("mobile")) {
+    await page.getByRole("button", { name: "Toggle navigation" }).click();
+  }
   await page.locator('nav a[href="/about/"]').click();
   await expect(page).toHaveURL(route("/about/"));
   await expect(page.locator("html")).toHaveAttribute("data-theme", initial!);
