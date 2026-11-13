@@ -118,7 +118,7 @@ test("language switch and theme control are operable by keyboard with visible fo
   await expect(language).toBeFocused();
   expect(await language.evaluate(element => getComputedStyle(element).outlineStyle)).not.toBe("none");
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(/\\/ar\\/$/);
+  await expect(page).toHaveURL(new RegExp("/ar/$"));
 
   const theme = page.locator("[data-theme-toggle]");
   for (let index = 0; index < 16 && !(await theme.evaluate(element => element === document.activeElement)); index++) {
