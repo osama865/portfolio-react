@@ -17,7 +17,7 @@ test("homepage renders styled hero and selected projects", async ({ page }, info
 test("theme toggle changes the document theme", async ({ page }) => {
   await page.goto("/");
   const before = await page.locator("html").getAttribute("data-theme");
-  await page.getByRole("button", { name: "Toggle light and dark theme" }).click();
+  await page.getByRole("button", { name: "Switch to dark theme" }).click();
   await expect(page.locator("html")).not.toHaveAttribute("data-theme", before ?? "light");
 });
 test("mobile navigation opens and reaches projects", async ({ page }, info) => {
