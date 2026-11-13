@@ -19,7 +19,7 @@ const { title = "Osama Ibrahim — Full-stack developer", description = "I build
   <header class="site-header"><div class="container nav-wrap">
     <a class="brand" href="/"><b>OI<span>.</span></b><small>OSAMA IBRAHIM</small></a>
     <nav data-nav aria-label="Main navigation"><a href="/">Home</a><a href="/projects/">Work</a><a href="/writing/">Writing</a><a href="/about/">About</a><a href="/approach/">How I work</a><a href="/contact/">Contact</a></nav>
-    <button class="theme-button" data-theme aria-label="Toggle light and dark theme">◐</button>
+    <button class="theme-button" type="button" data-theme-toggle aria-label="Toggle light and dark theme" aria-pressed="false">◐</button>
     <button class="menu-button" aria-label="Toggle navigation" aria-expanded="false" data-menu>☰</button>
   </div></header>
   <main id="main"><slot /></main>
@@ -28,12 +28,16 @@ const { title = "Osama Ibrahim — Full-stack developer", description = "I build
     const root = document.documentElement;
     const saved = localStorage.getItem("portfolio-theme");
     if (saved === "dark" || saved === "light") root.dataset.theme = saved;
+    document.querySelector<HTMLButtonElement>("[data-theme-toggle]")?.setAttribute("aria-pressed", String(root.dataset.theme === "dark"));
     // The root <html> also carries data-theme for CSS state. Target only the explicit control;
     // a broad [data-theme] selector attaches the handler to <html> and toggles on every bubbled click.
-    document.querySelector("button[data-theme]")?.addEventListener("click", (event) => {
+    const themeToggle = document.querySelector<HTMLButtonElement>("[data-theme-toggle]");
+    themeToggle?.addEventListener("click", (event) => {
       event.stopPropagation();
-      root.dataset.theme = root.dataset.theme === "dark" ? "light" : "dark";
-      localStorage.setItem("portfolio-theme", root.dataset.theme);
+      const nextTheme = root.dataset.theme === "dark" ? "light" : "dark";
+      root.dataset.theme = nextTheme;
+      themeToggle.setAttribute("aria-pressed", String(nextTheme === "dark"));
+      localStorage.setItem("portfolio-theme", nextTheme);
     });
     const menuButton = document.querySelector("[data-menu]");
     const nav = document.querySelector("[data-nav]");

@@ -10,7 +10,12 @@ test("ordinary page content clicks never change the theme", async ({ page }) => 
   await page.locator(".hero-quote").click();
   await page.locator(".hero-intro p").click();
   await page.locator(".intro-band").click();
+  await page.locator(".hero-aside").click();
+  await page.locator(".hero-bottom").click();
+  await page.locator(".site-footer .footer-wrap").click();
   expect(await currentTheme(page)).toBe(before);
+  expect(await page.locator("button[data-theme-toggle]").count()).toBe(1);
+  expect(await page.locator("button[data-theme]").count()).toBe(0);
 });
 
 test("project card navigation preserves the selected theme", async ({ page }) => {
@@ -44,7 +49,7 @@ test("navigation and ordinary buttons do not change the theme", async ({ page },
 
 test("the explicit theme switch changes the theme exactly once per activation", async ({ page }) => {
   await page.goto("/");
-  const control = page.getByRole("button", { name: "Toggle light and dark theme" });
+  const control = page.locator("button[data-theme-toggle]");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   await page.evaluate(() => {
     const root = document.documentElement;
@@ -55,16 +60,18 @@ test("the explicit theme switch changes the theme exactly once per activation", 
   });
   await control.click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(control).toHaveAttribute("aria-pressed", "true");
   await expect.poll(() => page.evaluate(() => (window as typeof window & { __themeChanges?: () => number }).__themeChanges?.() ?? 0)).toBe(1);
   expect(await page.evaluate(() => localStorage.getItem("portfolio-theme"))).toBe("dark");
   await control.click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await expect(control).toHaveAttribute("aria-pressed", "false");
   expect(await page.evaluate(() => localStorage.getItem("portfolio-theme"))).toBe("light");
 });
 
 test("the selected theme persists across internal navigation and reload", async ({ page }, info) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "Toggle light and dark theme" }).click();
+  await page.locator("button[data-theme-toggle]").click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   if (info.project.name.startsWith("mobile")) {
     await page.getByRole("button", { name: "Toggle navigation" }).click();

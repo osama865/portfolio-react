@@ -11,6 +11,8 @@ test("deployed Astro preview changes theme only through its explicit switch", as
   await page.goto(origin);
   await expect(page).toHaveTitle(/A developer, a dreamer, and ever so often, a human/);
   const initial = await page.locator("html").getAttribute("data-theme");
+  await expect(page.locator("button[data-theme-toggle]")).toHaveCount(1);
+  await expect(page.locator("button[data-theme]")).toHaveCount(0);
 
   // Ordinary content clicks must not affect theme state.
   await page.locator(".hero-quote").click();
@@ -37,7 +39,7 @@ test("deployed Astro preview changes theme only through its explicit switch", as
 
   // The explicit theme control changes the attribute once and persists it.
   await page.goto(origin);
-  const control = page.getByRole("button", { name: "Toggle light and dark theme" });
+  const control = page.locator("button[data-theme-toggle]");
   await page.evaluate(() => {
     const root = document.documentElement;
     let changes = 0;
@@ -49,6 +51,7 @@ test("deployed Astro preview changes theme only through its explicit switch", as
   await control.click();
   const afterToggle = beforeToggle === "dark" ? "light" : "dark";
   await expect(page.locator("html")).toHaveAttribute("data-theme", afterToggle);
+  await expect(control).toHaveAttribute("aria-pressed", String(afterToggle === "dark"));
   await expect.poll(() => page.evaluate(() => (window as typeof window & { __themeChanges?: () => number }).__themeChanges?.() ?? 0)).toBe(1);
   expect(await page.evaluate(() => localStorage.getItem("portfolio-theme"))).toBe(afterToggle);
   await page.reload();
