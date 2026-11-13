@@ -69,7 +69,7 @@ const links = [
         syncThemeControl();
       };
       const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const supportsTransition = "startViewTransition" in document && !reduced;
+      const supportsTransition = typeof (document as any).startViewTransition === "function" && !reduced;
       if (supportsTransition) {
         const button = themeToggle.getBoundingClientRect();
         root.style.setProperty("--theme-origin-x", `${button.left + button.width / 2}px`);
