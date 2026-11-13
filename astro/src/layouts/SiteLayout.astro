@@ -1,13 +1,15 @@
 ---
 import "../styles/global.css";
 const { title = "Osama Ibrahim — Full-stack developer", description = "I build useful, dependable digital products." } = Astro.props;
+const buildCommit = process.env.CF_PAGES_COMMIT_SHA ?? process.env.GITHUB_SHA ?? "local";
 ---
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="light" data-build-commit={buildCommit}>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content={description} />
+  <meta name="portfolio-build-commit" content={buildCommit} />
   <meta name="theme-color" content="#f5f7fb" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
