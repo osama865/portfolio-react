@@ -1,0 +1,9 @@
+---
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import ProjectCard from "../../components/ProjectCard.astro";
+import { projects } from "../../data/projects";
+---
+<SiteLayout title="Projects — Osama Ibrahim" description="Software projects, product work and experiments by Osama Ibrahim.">
+  <section class="page-hero"><div class="container"><small class="eyebrow">SELECTED WORK / PROJECT ARCHIVE</small><h1>A collection of things <em style="color:var(--blue);font-style:normal">I've built.</em></h1><p>Real projects, different stages, and lessons carried forward. Historical links are references, not proof that every deployment is currently online.</p><div class="case-meta"><span>{projects.length} PROJECTS</span><span>WEB · PRODUCT · EXPERIMENTS</span></div></div></section>
+  <section class="section"><div class="container project-grid all-projects">{projects.map((project)=><ProjectCard project={project}/>)}</div></section>
+</SiteLayout>

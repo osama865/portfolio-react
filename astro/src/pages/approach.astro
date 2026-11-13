@@ -1,0 +1,9 @@
+---
+import SiteLayout from "../layouts/SiteLayout.astro";
+const steps=[["01","Understand the real problem","Clarify the people, constraints and outcome before choosing a technical direction."],["02","Shape a practical solution","Keep the experience focused, architecture proportionate and important decisions visible."],["03","Build in verifiable steps","Prefer working increments, meaningful commits and tests that prove the behavior that matters."],["04","Deliver with evidence","Check the actual result, document limitations and never present an unverified feature as finished."]];
+---
+<SiteLayout title="Engineering approach — Osama Ibrahim" description="How I approach product engineering and software delivery.">
+<section class="page-hero"><div class="container"><small class="eyebrow">ENGINEERING APPROACH</small><h1>Build with intent.<br/><em style="color:var(--blue);font-style:normal">Prove what works.</em></h1><p>A practical way of working that keeps the problem, the people and the quality of the result in view.</p></div></section>
+<section class="section"><div class="container approach">{steps.map(([n,title,desc])=><article><b>{n}</b><div><h2>{title}</h2><p>{desc}</p></div><span>↗</span></article>)}</div></section>
+<section class="statement"><div class="container"><small class="eyebrow">A SIMPLE RULE</small><h2>Finished means <em>working, checked,</em> and clear about its limits.</h2></div></section>
+</SiteLayout>
