@@ -94,7 +94,7 @@ test("Arabic case-study pages have no broken local images or horizontal overflow
     const errors: string[] = [];
     page.on("pageerror", error => errors.push(error.message));
     await page.goto(route);
-    const broken = await page.locator("img").evaluateAll(images => images.filter((img: HTMLImageElement) => !img.complete || img.naturalWidth === 0).map(img => img.src));
+    const broken = await page.locator("img").evaluateAll(images => (images as HTMLImageElement[]).filter(img => !img.complete || img.naturalWidth === 0).map(img => img.src));
     expect(broken, route).toEqual([]);
     const dimensions = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, client: document.documentElement.clientWidth }));
     expect(dimensions.scroll, route).toBeLessThanOrEqual(dimensions.client + 1);
