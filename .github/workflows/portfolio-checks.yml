@@ -131,6 +131,7 @@ jobs:
           NODE
       - name: Verify theme interactions and visual evidence on deployed preview
         if: |
+          (github.event_name == 'push' && github.ref == 'refs/heads/phase-2/evidence-backed-case-studies') ||
           (github.event_name == 'push' && github.ref == 'refs/heads/phase-1/astro-foundation') ||
           (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/phase-1/astro-foundation') ||
           (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'master')
