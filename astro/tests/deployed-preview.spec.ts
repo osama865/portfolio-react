@@ -148,31 +148,29 @@ test("audit every configured external destination and preserve its response evid
   const unique = [...new Map(destinations.map((item) => [item.url, item])).values()];
   const results = [];
 
-  for (const item of unique) {
-    try {
-      const response = await request.get(item.url, { timeout: 15_000, maxRedirects: 8 });
-      const status = response.status();
-      const disposition =
-        status >= 200 && status < 400 ? "reachable" :
-        status === 404 || status === 410 ? "unavailable" :
-        status === 401 || status === 403 || status === 429 ? "access-restricted" :
-        status >= 500 ? "server-error" : "http-error";
-      results.push({
-        ...item,
-        status,
-        finalUrl: response.url(),
-        disposition
-      });
-    } catch (error) {
-      results.push({
-        ...item,
-        status: null,
-        finalUrl: null,
-        disposition: "network-error",
-        error: error instanceof Error ? error.message : String(error)
-      });
-    }
-    console.log("EXTERNAL LINK AUDIT", JSON.stringify(results[results.length - 1]));
+  for (let index = 0; index < unique.length; index += 6) {
+    const batch = await Promise.all(unique.slice(index, index + 6).map(async (item) => {
+      try {
+        const response = await request.get(item.url, { timeout: 15_000, maxRedirects: 8 });
+        const status = response.status();
+        const disposition =
+          status >= 200 && status < 400 ? "reachable" :
+          status === 404 || status === 410 ? "unavailable" :
+          status === 401 || status === 403 || status === 429 ? "access-restricted" :
+          status >= 500 ? "server-error" : "http-error";
+        return { ...item, status, finalUrl: response.url(), disposition };
+      } catch (error) {
+        return {
+          ...item,
+          status: null,
+          finalUrl: null,
+          disposition: "network-error",
+          error: error instanceof Error ? error.message : String(error)
+        };
+      }
+    }));
+    results.push(...batch);
+    batch.forEach((item) => console.log("EXTERNAL LINK AUDIT", JSON.stringify(item)));
   }
 
   mkdirSync("test-results", { recursive: true });
