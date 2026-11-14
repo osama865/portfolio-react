@@ -51,14 +51,14 @@ const links = [
 <body>
   <header class="site-header"><div class="container nav-wrap">
     <a class="brand" href={locale === "ar" ? "/ar/" : "/"}><b>OI<span>.</span></b><small>OSAMA IBRAHIM</small></a>
-    <nav data-nav aria-label={locale === "ar" ? "التنقل الرئيسي" : "Main navigation"}>{links.map(([label, href]) => <a href={href}>{label}</a>)}</nav>
+    <nav id="primary-navigation" data-nav aria-label={locale === "ar" ? "التنقل الرئيسي" : "Main navigation"}>{links.map(([label, href]) => <a href={href}>{label}</a>)}</nav>
     <div class="nav-tools">
       <a class="language-switch" href={counterpart(pathname)} lang={locale === "ar" ? "en" : "ar"}>{t.language}</a>
       <button class="theme-button" type="button" data-theme-toggle aria-label={t.themeToDark} aria-pressed="false" title={t.themeToDark}>
         <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>
         <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.6 8.6 0 1 0 20.5 14.2Z"/></svg>
       </button>
-      <button class="menu-button" type="button" aria-label={t.menu} aria-expanded="false" data-menu>☰</button>
+      <button class="menu-button" type="button" aria-label={t.menu} aria-controls="primary-navigation" aria-expanded="false" data-menu>☰</button>
     </div>
   </div></header>
   <main id="main"><slot /></main>
@@ -98,10 +98,22 @@ const links = [
     });
     const menuButton = document.querySelector<HTMLButtonElement>("[data-menu]");
     const nav = document.querySelector<HTMLElement>("[data-nav]");
+    const setMenuOpen = (open: boolean) => {
+      menuButton?.setAttribute("aria-expanded", String(open));
+      nav?.classList.toggle("open", open);
+    };
     menuButton?.addEventListener("click", () => {
-      const open = menuButton.getAttribute("aria-expanded") === "true";
-      menuButton.setAttribute("aria-expanded", String(!open));
-      nav?.classList.toggle("open", !open);
+      setMenuOpen(menuButton.getAttribute("aria-expanded") !== "true");
+    });
+    // Escape dismisses the mobile navigation and returns focus to its trigger.
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && menuButton?.getAttribute("aria-expanded") === "true") {
+        setMenuOpen(false);
+        menuButton.focus();
+      }
+    });
+    nav?.addEventListener("click", (event) => {
+      if ((event.target as HTMLElement).closest("a")) setMenuOpen(false);
     });
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const revealItems = document.querySelectorAll("[data-reveal]");
