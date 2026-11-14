@@ -407,7 +407,8 @@ test("light-theme accent and muted text meet AA over the strongest hero gradient
     probe.style.color = "var(--blue)";
     probe.style.backgroundColor = "color-mix(in srgb, var(--blue) 10%, var(--bg))";
     document.body.append(probe);
-    const rgb = (value: string) => { const channels = value.match(/[\d.]+/g)!.slice(0, 3).map(Number); return Math.max(...channels) <= 1 ? channels.map((channel) => channel * 255) : channels; };\n    const background = rgb(getComputedStyle(probe).backgroundColor);
+    const rgb = (value: string) => { const channels = value.match(/[\d.]+/g)!.slice(0, 3).map(Number); return Math.max(...channels) <= 1 ? channels.map((channel) => channel * 255) : channels; };
+    const background = rgb(getComputedStyle(probe).backgroundColor);
     const contrast = (foreground: number[]) => {
       const linear = (value: number) => {
         const channel = value / 255;
