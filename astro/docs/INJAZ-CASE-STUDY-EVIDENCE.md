@@ -30,15 +30,15 @@ Source and release records support a browser application using Supabase Auth, Po
 | WS-02 | Preview/deployment foundation has staged evidence; production target/URL remains unverified in current matrix | Deployment foundation; production status not claimed |
 | WS-03 | Accepted 2026-11-10 for defined security scope | Security workstream accepted |
 | WS-03.5 Stage A/B | Stage A and Stage B merged; focused visual evidence recorded | Provisional product identity applied; focused checks passed |
-| WS-04 | PR #21 Draft/unmerged; Gate 1 not accepted | Identity/lifecycle remediation in progress |
-| WS-05 | PR #22 Draft/unmerged | Mission workflow correction under review |
-| WS-06 | CSV parser/preview issues remain in matrix | Not accepted |
+| WS-04 | PR #21 merged 2026-11-14; focused Gate 1 evidence passed: 189 pgTAP, Storage/concurrent-invitation API 2/2, invitation setup 4/4, Admin cancellation 1/1, HoD delegated-bundle cancellation 1/1 | Gate 1 implementation merged; do not infer acceptance of every lifecycle scenario or the entire workstream |
+| WS-05 | PR #25 merged with stale-pending browser/database regression; PR #27 open for quarterly-report guardrails; PR #26 Draft for quarterly deadlines/RLS; PR #22 Draft for mission-bundle cancellation | Active workstream; selected fixes merged, remaining changes under review |
+| WS-06 | PR #24 merged 2026-11-14; exact-head acceptance 9/9 unit tests, Edge Function type-check and browser import/re-import 1/1 | Focused CSV import gate passed; not overall V1 acceptance |
 | WS-07 | Required exports absent in inspected matrix | Not accepted |
 | WS-08 | PWA levels and installability qualification remain | Not fully accepted |
 | WS-09 | DB+Storage restore drill and storage backup evidence remain | Not accepted |
 | WS-10 | Release-wide QA evidence and PO acceptance incomplete | Not accepted |
 
-## Visual evidence
+## Status source references (14 November 2026)\n\n- [WS-04 Gate 1 PR #21](https://github.com/osama865/IAH/pull/21) — merged; exact-head checks recorded in its PR description.\n- [WS-06 CSV import PR #24](https://github.com/osama865/IAH/pull/24) — merged; exact-head browser acceptance 1/1 and unit tests 9/9.\n- [WS-05 core workflow PR #25](https://github.com/osama865/IAH/pull/25) — merged focused stale-pending correction.\n- [WS-05 mission-bundle cancellation PR #22](https://github.com/osama865/IAH/pull/22), [quarterly-report guardrails PR #27](https://github.com/osama865/IAH/pull/27), and [quarterly deadline/RLS PR #26](https://github.com/osama865/IAH/pull/26) — remain open; do not describe WS-05 as complete.\n\n## Visual evidence
 
 No approved public application screenshot was available in the portfolio evidence set. The public case study therefore uses a labelled architecture diagram and workflow diagram, not fabricated application UI. Existing internal CI screenshots contain synthetic or authenticated views and require redaction/publication approval before use.
 
