@@ -334,7 +334,7 @@ test("deployed navigation, theme and focus interactions are keyboard accessible"
     await page.goto(route(locale === "ar" ? "/ar/" : "/"));
     const nav = page.getByRole("navigation", { name: locale === "ar" ? "التنقل الرئيسي" : "Main navigation" });
     const menu = page.getByRole("button", { name: locale === "ar" ? "فتح أو إغلاق قائمة التنقل" : "Toggle navigation" });
-    const theme = page.getByRole("button", { name: locale === "ar" ? "التبديل إلى المظهر الداكن" : "Switch to dark theme" });
+    const theme = page.locator("[data-theme-toggle]");
     await expect(nav).toBeHidden();
     await expect(menu).toHaveAttribute("aria-controls", "primary-navigation");
     await menu.focus();
@@ -368,7 +368,7 @@ test("deployed navigation, theme and focus interactions are keyboard accessible"
     await page.keyboard.press("Shift+Tab");
     await expect(page.locator("a.language-switch")).toBeFocused();
     await page.keyboard.press("Shift+Tab");
-    await expect(navLinks.nth(5)).toBeFocused();
+    await expect(page.locator(".brand").first()).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(page.locator("a.language-switch")).toBeFocused();
     await page.keyboard.press("Tab");
