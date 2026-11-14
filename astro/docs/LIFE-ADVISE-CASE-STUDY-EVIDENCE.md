@@ -61,9 +61,13 @@ These counts describe those exact files only. They are not a verified total of t
 
 No provenance-safe application screenshots were found in the evidence set. The public case study uses an explicitly explanatory architecture/evolution diagram and a timeline. Neither is presented as a product screenshot.
 
-## Attribution limits
+## Personal contribution and attribution
 
-Repository ownership and source history support that this is the user's project history, but they do not prove sole authorship of every component. Exact personal contributions to Meteor, React, Dexie, service-worker, Express backend and API integration require Product Owner confirmation. See `PROJECT-ATTRIBUTION-MATRIX.md`.
+The Product Owner confirms that Life-Advise began in 2021 during a month-long internet outage and that the advice/quotation collection was gathered and curated manually, not scraped or AI-generated. This supports public attribution for the project's initiation, original motivation and content curation.
+
+The three repository snapshots document the Meteor generation, later React client and separate Express backend reference. Git history also records sustained commits under the user's account. These facts support involvement in the project's evolution, but they do not establish sole authorship of every file or distinguish original implementation from adapted/tutorial-derived components. Public copy therefore does not claim sole authorship of the Meteor, React, Dexie, service-worker, backend or API modules. The modern recovery review is presented as later work, not as part of the original implementation.
+
+See `PROJECT-ATTRIBUTION-MATRIX.md` for the claim-by-claim boundary.
 
 ## Sources
 

@@ -39,6 +39,21 @@ const routes = [
   { path: "/projects/aos-testing/", title: "AOS animation tests — Osama Ibrahim" }
 ];
 
+test("featured case studies explain personal contribution without claiming sole code authorship", async ({ page }) => {
+  for (const item of [
+    { path: "/projects/injaz/", heading: "My contribution", phrase: "I lead INJAZ as its Product Owner", caveat: "I do not present all application code" },
+    { path: "/projects/life-advise/", heading: "My contribution", phrase: "I started Life-Advise in 2021", caveat: "they do not establish sole authorship" },
+    { path: "/ar/projects/injaz/", heading: "مساهمتي في المشروع", phrase: "أتولى دور مالك المنتج في إنجاز", caveat: "لا أنسب إلى نفسي كتابة الشيفرة كلها" },
+    { path: "/ar/projects/life-advise/", heading: "مساهمتي في المشروع", phrase: "بدأت Life-Advise عام 2021", caveat: "لا أنسب إلى نفسي ما لا تثبته الأدلة" }
+  ]) {
+    await page.goto(item.path);
+    await expect(page.getByRole("heading", { name: item.heading })).toBeVisible();
+    const contribution = page.locator(".contribution");
+    await expect(contribution).toContainText(item.phrase);
+    await expect(contribution).toContainText(item.caveat);
+  }
+});
+
 for (const route of routes) {
   test(`route ${route.path} renders correctly`, async ({ page }) => {
     const response = await page.goto(route.path);

@@ -49,7 +49,7 @@ No approved public application screenshot was available in the portfolio evidenc
 - No current WS-04 acceptance record or merged accepted head.
 - SMTP delivery remains unverified in WS-03 acceptance record.
 - No complete commercial-readiness run or DB+Storage recovery drill evidence.
-- Personal authorship of individual modules and exact architecture authorship remain unconfirmed.
+- The Product Owner's role in product direction, requirements, prioritisation, evidence review and release governance is supported. Personal authorship of individual application modules and exact architecture decisions remains unconfirmed.
 - Private identifiers, employee records, internal project references, credentials and security-sensitive predicates are excluded from public copy.
 
 ## Source links

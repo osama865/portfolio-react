@@ -125,6 +125,10 @@ html[data-theme=dark] .hero-quote em{color:var(--blue)}
 .case-study li{margin:10px 0}
 .case-study code{font-size:.88em;background:var(--soft);padding:2px 5px;border-radius:4px}
 .case-study .evidence{color:var(--text);margin-top:30px}
+.contribution{margin:34px 0;padding:18px 20px;border-inline-start:2px solid var(--blue);background:var(--soft);border-radius:0 10px 10px 0}
+.contribution h3{font-size:18px!important;margin:0 0 8px!important}
+.contribution p{color:var(--text);margin:0;line-height:1.85}
+html[dir=rtl] .contribution{border-radius:10px 0 0 10px}
 .diagram{margin:24px 0;padding:22px;background:var(--surface);border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:10px}
 .diagram-node{width:min(100%,560px);padding:14px 18px;border:1px solid var(--line);border-radius:9px;background:var(--soft);text-align:center;display:flex;flex-direction:column}
 .diagram-node b{font-size:14px;color:var(--text)}
