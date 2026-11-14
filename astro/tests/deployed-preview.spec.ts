@@ -325,3 +325,56 @@ test("axe accessibility smoke scan covers representative English and Arabic rout
       : []));
   expect(serious, JSON.stringify(serious, null, 2)).toEqual([]);
 });
+
+test("deployed navigation, theme and focus interactions are keyboard accessible", async ({ page }, info) => {
+  test.skip(!info.project.name.startsWith("mobile"), "Keyboard navigation controls are exercised in the mobile layout.");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  for (const locale of ["en", "ar"] as const) {
+    await page.goto(route(locale === "ar" ? "/ar/" : "/"));
+    const nav = page.getByRole("navigation", { name: locale === "ar" ? "التنقل الرئيسي" : "Main navigation" });
+    const menu = page.getByRole("button", { name: locale === "ar" ? "فتح أو إغلاق قائمة التنقل" : "Toggle navigation" });
+    const theme = page.getByRole("button", { name: locale === "ar" ? "التبديل إلى المظهر الداكن" : "Switch to dark theme" });
+    await expect(nav).toBeHidden();
+    await expect(menu).toHaveAttribute("aria-controls", "primary-navigation");
+    await menu.focus();
+    await page.keyboard.press("Space");
+    await expect(menu).toHaveAttribute("aria-expanded", "true");
+    await expect(nav).toBeVisible();
+
+    const navLinks = nav.getByRole("link");
+    await expect(navLinks).toHaveCount(6);
+    await page.locator(".brand").first().focus();
+    for (let index = 0; index < 6; index += 1) {
+      await page.keyboard.press("Tab");
+      await expect(navLinks.nth(index)).toBeFocused();
+      if (index === 0) {
+        const focusStyle = await navLinks.nth(index).evaluate((element) => {
+          const style = getComputedStyle(element);
+          return { outlineStyle: style.outlineStyle, outlineWidth: style.outlineWidth };
+        });
+        expect(focusStyle.outlineStyle).not.toBe("none");
+        expect(parseFloat(focusStyle.outlineWidth)).toBeGreaterThanOrEqual(2);
+      }
+    }
+
+    await page.keyboard.press("Escape");
+    await expect(menu).toHaveAttribute("aria-expanded", "false");
+    await expect(nav).toBeHidden();
+    await expect(menu).toBeFocused();
+
+    await page.keyboard.press("Tab");
+    await expect(page.locator("a.language-switch")).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(theme).toBeFocused();
+    await page.keyboard.press("Space");
+    await expect(theme).toHaveAttribute("aria-pressed", "true");
+    await expect(theme).toHaveAccessibleName(locale === "ar" ? "التبديل إلى المظهر الفاتح" : "Switch to light theme");
+    const reducedMotion = await page.evaluate(() => ({
+      requested: matchMedia("(prefers-reduced-motion: reduce)").matches,
+      bodyTransition: getComputedStyle(document.body).transitionDuration
+    }));
+    expect(reducedMotion.requested).toBeTruthy();
+    expect(reducedMotion.bodyTransition.split(",").every((duration) => parseFloat(duration) === 0)).toBeTruthy();
+  }
+});
