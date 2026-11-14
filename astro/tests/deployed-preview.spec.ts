@@ -397,3 +397,35 @@ test("Arabic case-study diagrams expose labelled graphic semantics", async ({ pa
     await expect(page.getByRole("img", { name: item.label })).toBeVisible();
   }
 });
+
+test("light-theme accent and muted text meet AA over the strongest hero gradient", async ({ page }, info) => {
+  test.skip(!info.project.name.startsWith("mobile"), "Contrast calculation runs once per workflow.");
+  await page.goto(route("/"));
+  await page.locator("html").evaluate((element) => element.setAttribute("data-theme", "light"));
+  const ratios = await page.evaluate(() => {
+    const probe = document.createElement("span");
+    probe.style.color = "var(--blue)";
+    probe.style.backgroundColor = "color-mix(in srgb, var(--blue) 10%, var(--bg))";
+    document.body.append(probe);
+    const background = getComputedStyle(probe).backgroundColor.match(/[\\d.]+/g)!.slice(0, 3).map(Number);
+    const contrast = (foreground: number[]) => {
+      const linear = (value: number) => {
+        const channel = value / 255;
+        return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+      };
+      const luminance = (rgb: number[]) => {
+        const [r, g, b] = rgb.map(linear);
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      };
+      const values = [luminance(foreground), luminance(background)].sort((a, b) => b - a);
+      return (values[0] + 0.05) / (values[1] + 0.05);
+    };
+    const accent = getComputedStyle(probe).color.match(/[\\d.]+/g)!.slice(0, 3).map(Number);
+    probe.style.color = "var(--muted)";
+    const muted = getComputedStyle(probe).color.match(/[\\d.]+/g)!.slice(0, 3).map(Number);
+    probe.remove();
+    return { accent: contrast(accent), muted: contrast(muted) };
+  });
+  expect(ratios.accent, "Light accent text over the hero gradient").toBeGreaterThanOrEqual(4.5);
+  expect(ratios.muted, "Muted text over the hero gradient").toBeGreaterThanOrEqual(4.5);
+});
