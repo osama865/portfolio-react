@@ -386,3 +386,14 @@ test("deployed navigation, theme and focus interactions are keyboard accessible"
     expect(reducedMotion.bodyTransition.split(",").every((duration) => parseFloat(duration) === 0)).toBeTruthy();
   }
 });
+
+test("Arabic case-study diagrams expose labelled graphic semantics", async ({ page }, info) => {
+  test.skip(!info.project.name.startsWith("mobile"), "Semantic graphic checks run once in the mobile browser project.");
+  for (const item of [
+    { path: "/ar/projects/injaz/", label: "مخطط معماري توضيحي" },
+    { path: "/ar/projects/life-advise/", label: "مخطط تطور توضيحي" }
+  ]) {
+    await page.goto(route(item.path));
+    await expect(page.getByRole("img", { name: item.label })).toBeVisible();
+  }
+});
