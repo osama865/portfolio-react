@@ -26,11 +26,11 @@ Keep the Astro portfolio in its isolated Cloudflare Pages project. Do not repoin
 
 ## Required production configuration
 
-The public domain has not yet been confirmed. Do not substitute a preview hostname.
+The intended future production domain is `osamaibrahim.com`. It is not purchased or allocated yet. Do not configure DNS or enable production indexing until the domain is acquired and explicitly authorized.
 
 | Variable | Production value | Preview value |
 |---|---|---|
-| `PUBLIC_SITE_URL` | The approved HTTPS origin, e.g. `https://portfolio.example.com` (replace with the actual approved domain) | Unset |
+| `PUBLIC_SITE_URL` | `https://osamaibrahim.com` (configure only after domain acquisition and release authorization) | Unset |
 | `PUBLIC_SITE_INDEXABLE` | `true`, only after the production domain and content are approved | Unset or `false` |
 
 Set production variables only in the Cloudflare Pages **Production** environment. Preview deployments must not inherit the production indexability flag. When either variable is absent, the build deliberately omits canonical/hreflang/absolute Open Graph URL metadata, emits a disallow-all `robots.txt`, and writes an `X-Robots-Tag: noindex, nofollow` header into the build output.
@@ -53,7 +53,7 @@ Preview builds receive a noindex response header. Production should not receive 
 
 ## Deployment sequence
 
-1. Obtain explicit approval of the production hostname and final release.
+1. Acquire/allocate `osamaibrahim.com` when ready, then obtain explicit approval of the final release.
 2. Create/use a separate Cloudflare Pages production project for this Astro site; do not change the existing production project.
 3. Configure the production root, build command, output directory and Node 22 runtime.
 4. Add `PUBLIC_SITE_URL` and `PUBLIC_SITE_INDEXABLE=true` to the production environment only.
@@ -83,4 +83,4 @@ Cloudflare Pages retains previous deployments. If the production smoke test fail
 
 ## Decisions still required
 
-The one configuration value that cannot be inferred safely is the **canonical production HTTPS origin** (for example, `https://yourdomain.com`). It is required before absolute canonical URLs, reciprocal `hreflang`, `og:url`, sitemap locations and production indexing can be enabled. Production deployment itself remains subject to explicit release approval.
+No domain decision is outstanding: the intended origin is `https://osamaibrahim.com`. The remaining domain step is purely operational and deferred until you choose to acquire/allocate it. Until then, previews remain functional and noindex, with no production canonical. Production deployment remains subject to explicit release approval.
