@@ -53,10 +53,25 @@ test("every deployed locale route is usable at mobile, tablet and desktop widths
       await expect(page.locator("meta[name='description']")).toHaveAttribute("content", /.+/);
       await expect(page).toHaveTitle(/.+/);
 
-      const dimensions = await page.evaluate(() => ({
-        scrollWidth: document.documentElement.scrollWidth,
-        clientWidth: document.documentElement.clientWidth
-      }));
+      const dimensions = await page.evaluate(() => {
+        const width = document.documentElement.clientWidth;
+        const offenders = [...document.querySelectorAll("body *")].flatMap((element) => {
+          const rect = element.getBoundingClientRect();
+          if (rect.right <= width + 1 && rect.left >= -1) return [];
+          const style = getComputedStyle(element);
+          return [{
+            tag: element.tagName.toLowerCase(),
+            className: typeof element.className === "string" ? element.className : "",
+            text: (element.textContent ?? "").trim().replace(/\\s+/g, " ").slice(0, 100),
+            left: Math.round(rect.left),
+            right: Math.round(rect.right),
+            width: Math.round(rect.width),
+            overflowWrap: style.overflowWrap,
+            whiteSpace: style.whiteSpace
+          }];
+        });
+        return { scrollWidth: document.documentElement.scrollWidth, clientWidth: width, offenders: offenders.slice(0, 12) };
+      });
       expect(
         dimensions.scrollWidth,
         `${viewport.name} horizontal overflow on ${path}: ${JSON.stringify(dimensions)}`
