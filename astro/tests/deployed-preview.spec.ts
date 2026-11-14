@@ -363,6 +363,12 @@ test("deployed navigation, theme and focus interactions are keyboard accessible"
     await expect(nav).toBeHidden();
     await expect(menu).toBeFocused();
 
+    await page.keyboard.press("Shift+Tab");
+    await expect(theme).toBeFocused();
+    await page.keyboard.press("Shift+Tab");
+    await expect(page.locator("a.language-switch")).toBeFocused();
+    await page.keyboard.press("Shift+Tab");
+    await expect(navLinks.nth(5)).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(page.locator("a.language-switch")).toBeFocused();
     await page.keyboard.press("Tab");
