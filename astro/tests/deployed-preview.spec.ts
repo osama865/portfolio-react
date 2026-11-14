@@ -331,6 +331,8 @@ test("deployed navigation, theme and focus interactions are keyboard accessible"
   await page.setViewportSize({ width: 390, height: 844 });
   await page.emulateMedia({ reducedMotion: "reduce" });
   for (const locale of ["en", "ar"] as const) {
+    await page.goto(previewUrl!);
+    await page.evaluate(() => localStorage.setItem("portfolio-theme", "light"));
     await page.goto(route(locale === "ar" ? "/ar/" : "/"));
     const nav = page.getByRole("navigation", { name: locale === "ar" ? "التنقل الرئيسي" : "Main navigation" });
     const menu = page.getByRole("button", { name: locale === "ar" ? "فتح أو إغلاق قائمة التنقل" : "Toggle navigation" });
