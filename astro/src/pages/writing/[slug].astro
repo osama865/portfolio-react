@@ -1,0 +1,13 @@
+---
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import { writing } from "../../data/writing";
+export function getStaticPaths(){ return writing.map((item)=>({params:{slug:item.slug},props:{item}})); }
+const { item } = Astro.props;
+---
+<SiteLayout title={`${item.title} — Writing by Osama Ibrahim`} description={item.summary}>
+  <section class="page-hero"><div class="container writing-detail-hero"><a class="read-link" href="/writing/">← All writing</a><small class="eyebrow"> / {item.category}</small><div class="writing-meta"><time datetime={item.dateISO}>{item.date}</time><span>{item.platform}</span></div><h1>{item.title}</h1><p>{item.summary}</p><div class="writing-tags">{item.tags.map(tag=><span>{tag}</span>)}</div></div></section>
+  <section class="section"><div class="container writing-detail">
+    <div class="writing-detail-note"><small class="eyebrow">A NOTE BEFORE YOU GO</small><p>This page is an index entry and a little context, not a rewritten copy of the original article. The full piece lives at its original publication.</p></div>
+    <div class="writing-source"><span class="eyebrow">ORIGINAL PUBLICATION</span><h2>{item.platform}</h2><p>{item.summary}</p><a class="button primary" href={item.url} target="_blank" rel="noopener noreferrer">Read the original article ↗</a>{item.alternate && <a class="writing-alternate" href={item.alternate} target="_blank" rel="noopener noreferrer">Also published on {item.platform === "Medium" ? "DEV" : "Medium"} ↗</a>}</div>
+  </div></section>
+</SiteLayout>

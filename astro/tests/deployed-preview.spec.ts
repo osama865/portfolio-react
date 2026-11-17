@@ -1,0 +1,432 @@
+import { test, expect } from "@playwright/test";
+import { projects } from "../src/data/projects";
+import { writing } from "../src/data/writing";
+import { mkdirSync, writeFileSync } from "node:fs";
+
+const previewUrl = process.env.DEPLOYED_PREVIEW_URL;
+const expectedCommit = process.env.EXPECTED_DEPLOYED_COMMIT;
+
+test.use({ trace: "on" });
+test.skip(!previewUrl, "Runs only when the isolated Cloudflare preview URL is supplied.");
+
+const route = (path: string) => new URL(path, previewUrl!).toString();
+
+test("deployed Astro preview serves the exact verified commit", async ({ page }) => {
+  await page.goto(previewUrl!);
+  await expect(page).toHaveTitle(/A developer, a dreamer, and ever so often, a human/);
+  if (expectedCommit) {
+    await expect(page.locator("meta[name='portfolio-build-commit']")).toHaveAttribute("content", expectedCommit);
+    await expect(page.locator("html")).toHaveAttribute("data-build-commit", expectedCommit);
+  }
+});
+
+
+test("every deployed locale route is usable at mobile, tablet and desktop widths", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop-chromium", "The deployed viewport matrix runs once in desktop Chromium; a separate mobile project covers real mobile emulation.");
+  test.setTimeout(240_000);
+
+  const paired = [
+    ["/", "/ar/"],
+    ["/projects/", "/ar/projects/"],
+    ["/writing/", "/ar/writing/"],
+    ["/about/", "/ar/about/"],
+    ["/approach/", "/ar/approach/"],
+    ["/contact/", "/ar/contact/"],
+    ...projects.map(({ slug }) => [`/projects/${slug}/`, `/ar/projects/${slug}/`]),
+    ...writing.map(({ slug }) => [`/writing/${slug}/`, `/ar/writing/${slug}/`])
+  ];
+  const routes = paired.flatMap(([english, arabic]) => [english, arabic]);
+  const viewports = [
+    { name: "mobile", width: 360, height: 800 },
+    { name: "tablet", width: 768, height: 1024 },
+    { name: "desktop", width: 1440, height: 900 }
+  ];
+
+  for (const viewport of viewports) {
+    await page.setViewportSize({ width: viewport.width, height: viewport.height });
+    for (const path of routes) {
+      await page.goto(route(path), { waitUntil: "domcontentloaded" });
+      const locale = path.startsWith("/ar/") ? "ar" : "en";
+      await expect(page.locator("html")).toHaveAttribute("lang", locale);
+      await expect(page.locator("html")).toHaveAttribute("dir", locale === "ar" ? "rtl" : "ltr");
+      await expect(page.locator("main h1").first()).toBeVisible();
+      await expect(page.locator("meta[name='description']")).toHaveAttribute("content", /.+/);
+      await expect(page).toHaveTitle(/.+/);
+
+      const dimensions = await page.evaluate(() => {
+        const width = document.documentElement.clientWidth;
+        const offenders = [...document.querySelectorAll("body *")].flatMap((element) => {
+          const rect = element.getBoundingClientRect();
+          if (rect.right <= width + 1 && rect.left >= -1) return [];
+          const style = getComputedStyle(element);
+          return [{
+            tag: element.tagName.toLowerCase(),
+            className: typeof element.className === "string" ? element.className : "",
+            text: (element.textContent ?? "").trim().replace(/\\s+/g, " ").slice(0, 100),
+            left: Math.round(rect.left),
+            right: Math.round(rect.right),
+            width: Math.round(rect.width),
+            overflowWrap: style.overflowWrap,
+            whiteSpace: style.whiteSpace
+          }];
+        });
+        return { scrollWidth: document.documentElement.scrollWidth, clientWidth: width, offenders: offenders.slice(0, 12) };
+      });
+      expect(
+        dimensions.scrollWidth,
+        `${viewport.name} horizontal overflow on ${path}: ${JSON.stringify(dimensions)}`
+      ).toBeLessThanOrEqual(dimensions.clientWidth + 1);
+
+      const expectedCounterpart = path.startsWith("/ar/") ? path.slice(3) || "/" : `/ar${path}`;
+      await expect(page.locator("a.language-switch")).toHaveAttribute("href", expectedCounterpart);
+      console.log(`DEPLOYED ROUTE PASS [${viewport.name}] ${path}`);
+    }
+  }
+
+  // Check both portrait and landscape orientation changes on the homepage.
+  for (const size of [{ width: 390, height: 844 }, { width: 844, height: 390 }]) {
+    await page.setViewportSize(size);
+    await page.goto(route("/ar/"));
+    const dimensions = await page.evaluate(() => ({
+      scrollWidth: document.documentElement.scrollWidth,
+      clientWidth: document.documentElement.clientWidth
+    }));
+    expect(dimensions.scrollWidth, `orientation overflow at ${size.width}x${size.height}`).toBeLessThanOrEqual(dimensions.clientWidth + 1);
+  }
+  // The isolated preview must never advertise itself as the production canonical.
+  await expect(page.locator("link[rel=canonical]")).toHaveCount(0);
+  await expect(page.locator("link[hreflang]")).toHaveCount(0);
+  await expect(page.locator("meta[property='og:url']")).toHaveCount(0);
+
+  const robots = await page.request.get(route("/robots.txt"));
+  expect(robots.ok()).toBeTruthy();
+  expect(await robots.text()).toContain("Disallow: /");
+  const sitemap = await page.request.get(route("/sitemap.xml"));
+  expect(sitemap.ok()).toBeTruthy();
+  const sitemapText = await sitemap.text();
+  expect(sitemapText).toContain("<urlset");
+  expect(sitemapText).not.toContain("<loc>");
+  expect(robots.headers()["x-robots-tag"] ?? "").toContain("noindex");
+});
+
+test("deployed preview preserves theme and locale navigation on desktop and mobile", async ({ page }, info) => {
+  await page.goto(previewUrl!);
+  const initial = await page.locator("html").getAttribute("data-theme");
+  await expect(page.locator("button[data-theme-toggle]")).toHaveCount(1);
+  await expect(page.locator("button[data-theme]")).toHaveCount(0);
+
+  await page.locator(".hero-quote").click();
+  await page.locator(".hero-intro p").click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", initial!);
+
+  if (info.project.name.startsWith("mobile")) {
+    const menu = page.getByRole("button", { name: "Toggle navigation" });
+    await menu.click();
+    await expect(menu).toHaveAttribute("aria-expanded", "true");
+    await page.locator("a.language-switch").click();
+    await expect(page).toHaveURL(route("/ar/"));
+    await expect(page.locator("html")).toHaveAttribute("lang", "ar");
+    await page.locator("a.language-switch").click();
+    await expect(page).toHaveURL(route("/"));
+  }
+
+  await page.locator("[data-theme-toggle]").click();
+  const selected = initial === "dark" ? "light" : "dark";
+  await expect(page.locator("html")).toHaveAttribute("data-theme", selected);
+  await expect(page.locator("[data-theme-toggle]")).toHaveAttribute("aria-pressed", String(selected === "dark"));
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", selected);
+});
+
+
+test("audit every configured external destination and preserve its response evidence", async ({ request }, info) => {
+  test.skip(info.project.name !== "desktop-chromium", "Run the external destination audit once per workflow.");
+  test.setTimeout(180_000);
+
+  const destinations = [
+    ...projects.flatMap((project) => [
+      ...(project.source ? [{ category: "project-source", label: project.name, url: project.source }] : []),
+      ...(project.reference ? [{ category: "historical-project-reference", label: project.name, url: project.reference }] : [])
+    ]),
+    ...writing.flatMap((item) => [
+      { category: "original-writing", label: item.title, url: item.url },
+      ...(item.alternate ? [{ category: "alternate-writing", label: item.title, url: item.alternate }] : [])
+    ]),
+    ...[
+      ["GitHub profile", "https://github.com/osama865"],
+      ["Medium profile", "https://medium.com/@osama1010"],
+      ["DEV profile", "https://dev.to/osam1010"],
+      ["X profile", "https://x.com/Osam1010"],
+      ["LinkedIn profile", "https://www.linkedin.com/in/osama-ibrahim-a854841a5/"]
+    ].map(([label, url]) => ({ category: "social-profile", label, url }))
+  ];
+  const unique = [...new Map(destinations.map((item) => [item.url, item])).values()];
+  const results = [];
+
+  for (let index = 0; index < unique.length; index += 6) {
+    const batch = await Promise.all(unique.slice(index, index + 6).map(async (item) => {
+      try {
+        const response = await request.get(item.url, { timeout: 15_000, maxRedirects: 8 });
+        const status = response.status();
+        const disposition =
+          status >= 200 && status < 400 ? "reachable" :
+          status === 404 || status === 410 ? "unavailable" :
+          status === 401 || status === 403 || status === 429 ? "access-restricted" :
+          status >= 500 ? "server-error" : "http-error";
+        return { ...item, status, finalUrl: response.url(), disposition };
+      } catch (error) {
+        return {
+          ...item,
+          status: null,
+          finalUrl: null,
+          disposition: "network-error",
+          error: error instanceof Error ? error.message : String(error)
+        };
+      }
+    }));
+    results.push(...batch);
+    batch.forEach((item) => console.log("EXTERNAL LINK AUDIT", JSON.stringify(item)));
+  }
+
+  mkdirSync("test-results", { recursive: true });
+  writeFileSync(
+    "test-results/external-link-audit.json",
+    JSON.stringify({
+      checkedAt: new Date().toISOString(),
+      checkedCount: results.length,
+      results,
+      note: "HTTP reachability is not semantic endorsement. 401/403/429 and network errors require manual interpretation; historical project references remain labelled as historical."
+    }, null, 2)
+  );
+  expect(results.length).toBe(unique.length);
+});
+
+test("capture English and Arabic visual matrix on deployed preview", async ({ page }, info) => {
+  const device = info.project.name.startsWith("mobile") ? "mobile" : "desktop";
+  const capture = async (name: string) => {
+    await page.evaluate(() => document.fonts.ready);
+    await page.screenshot({ path: `visual-evidence/deployed-${device}-${name}.png`, fullPage: true });
+  };
+  await page.emulateMedia({ reducedMotion: "reduce" });
+
+  await page.goto(previewUrl!);
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  await capture("en-home-light");
+  await page.locator("[data-theme-toggle]").click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await capture("en-home-dark");
+
+  await page.locator("a.language-switch").click();
+  await expect(page).toHaveURL(route("/ar/"));
+  await capture("ar-home-dark");
+  await page.locator("[data-theme-toggle]").click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await capture("ar-home-light");
+
+  const pages = [
+    { path: "/projects/", name: "en-project-archive" },
+    { path: "/ar/projects/", name: "ar-project-archive" },
+    { path: "/projects/injaz/", name: "en-injaz-case-study" },
+    { path: "/ar/projects/injaz/", name: "ar-injaz-case-study" },
+    { path: "/projects/life-advise/", name: "en-life-advise-case-study" },
+    { path: "/ar/projects/life-advise/", name: "ar-life-advise-case-study" },
+    { path: "/writing/", name: "en-writing-archive" },
+    { path: "/ar/writing/", name: "ar-writing-archive" },
+    { path: "/writing/choose-node-framework/", name: "en-writing-entry" },
+    { path: "/ar/writing/choose-node-framework/", name: "ar-writing-entry" }
+  ];
+  for (const item of pages) {
+    await page.goto(route(item.path));
+    await capture(item.name);
+  }
+
+  if (device === "mobile") {
+    await page.goto(previewUrl!);
+    const menu = page.getByRole("button", { name: "Toggle navigation" });
+    await menu.click();
+    await expect(menu).toHaveAttribute("aria-expanded", "true");
+    await capture("mobile-navigation-open");
+  }
+});
+
+test("axe accessibility smoke scan covers representative English and Arabic routes in both themes", async ({ page }, info) => {
+  const device = info.project.name.startsWith("mobile") ? "mobile" : "desktop";
+  const routes = [
+    ["/", "en-home"],
+    ["/ar/", "ar-home"],
+    ["/projects/", "en-project-archive"],
+    ["/ar/projects/", "ar-project-archive"],
+    ["/projects/injaz/", "en-injaz"],
+    ["/ar/projects/injaz/", "ar-injaz"],
+    ["/projects/life-advise/", "en-life-advise"],
+    ["/ar/projects/life-advise/", "ar-life-advise"],
+    ["/writing/", "en-writing"],
+    ["/ar/writing/", "ar-writing"],
+    ["/writing/choose-node-framework/", "en-writing-entry"],
+    ["/ar/writing/choose-node-framework/", "ar-writing-entry"]
+  ] as const;
+  const reports: Array<{ route: string; theme: string; violations: unknown[]; incomplete: unknown[] }> = [];
+  // Stabilise computed colors before axe reads them; theme transitions remain covered by the interaction tests.
+  await page.emulateMedia({ reducedMotion: "reduce" });
+
+  for (const [path, name] of routes) {
+    await page.goto(route(path));
+    await page.addScriptTag({ url: "https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js" });
+    for (const theme of ["light", "dark"] as const) {
+      const current = await page.locator("html").getAttribute("data-theme");
+      if (current !== theme) await page.locator("[data-theme-toggle]").click();
+      await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+      const result = await page.evaluate(async () => {
+        const axe = (window as any).axe;
+        return axe.run(document, {
+          runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] }
+        });
+      });
+      const violations = result.violations.map((violation: any) => ({
+        id: violation.id,
+        impact: violation.impact ?? null,
+        description: violation.description,
+        help: violation.help,
+        helpUrl: violation.helpUrl,
+        nodes: violation.nodes.map((node: any) => ({
+          target: node.target,
+          html: node.html,
+          failureSummary: node.failureSummary,
+          any: node.any.map((check: any) => ({
+            id: check.id,
+            message: check.message,
+            data: check.data,
+            relatedNodes: check.relatedNodes
+          })),
+          all: node.all.map((check: any) => ({
+            id: check.id,
+            message: check.message,
+            data: check.data,
+            relatedNodes: check.relatedNodes
+          })),
+          none: node.none.map((check: any) => ({
+            id: check.id,
+            message: check.message,
+            data: check.data,
+            relatedNodes: check.relatedNodes
+          }))
+        }))
+      }));
+      reports.push({ route: path, theme, violations, incomplete: result.incomplete });
+      console.log(`AXE ${device} ${theme} ${name}: ${result.violations.length} violations`);
+    }
+  }
+
+  mkdirSync("test-results", { recursive: true });
+  writeFileSync(`test-results/axe-${device}-report.json`, JSON.stringify(reports, null, 2));
+  const serious = reports.flatMap(report => report.violations.flatMap((violation: any) =>
+    (violation.impact === "serious" || violation.impact === "critical")
+      ? [{ route: report.route, theme: report.theme, id: violation.id, impact: violation.impact, nodes: violation.nodes }]
+      : []));
+  expect(serious, JSON.stringify(serious, null, 2)).toEqual([]);
+});
+
+test("deployed navigation, theme and focus interactions are keyboard accessible", async ({ page }, info) => {
+  test.skip(!info.project.name.startsWith("mobile"), "Keyboard navigation controls are exercised in the mobile layout.");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  for (const locale of ["en", "ar"] as const) {
+    await page.goto(previewUrl!);
+    await page.evaluate(() => localStorage.setItem("portfolio-theme", "light"));
+    await page.goto(route(locale === "ar" ? "/ar/" : "/"));
+    const nav = page.getByRole("navigation", { name: locale === "ar" ? "التنقل الرئيسي" : "Main navigation" });
+    const menu = page.getByRole("button", { name: locale === "ar" ? "فتح أو إغلاق قائمة التنقل" : "Toggle navigation" });
+    const theme = page.locator("[data-theme-toggle]");
+    await expect(nav).toBeHidden();
+    await expect(menu).toHaveAttribute("aria-controls", "primary-navigation");
+    await menu.focus();
+    await page.keyboard.press("Space");
+    await expect(menu).toHaveAttribute("aria-expanded", "true");
+    await expect(nav).toBeVisible();
+
+    const navLinks = nav.getByRole("link");
+    await expect(navLinks).toHaveCount(6);
+    await page.locator(".brand").first().focus();
+    for (let index = 0; index < 6; index += 1) {
+      await page.keyboard.press("Tab");
+      await expect(navLinks.nth(index)).toBeFocused();
+      if (index === 0) {
+        const focusStyle = await navLinks.nth(index).evaluate((element) => {
+          const style = getComputedStyle(element);
+          return { outlineStyle: style.outlineStyle, outlineWidth: style.outlineWidth };
+        });
+        expect(focusStyle.outlineStyle).not.toBe("none");
+        expect(parseFloat(focusStyle.outlineWidth)).toBeGreaterThanOrEqual(2);
+      }
+    }
+
+    await page.keyboard.press("Escape");
+    await expect(menu).toHaveAttribute("aria-expanded", "false");
+    await expect(nav).toBeHidden();
+    await expect(menu).toBeFocused();
+
+    await page.keyboard.press("Shift+Tab");
+    await expect(theme).toBeFocused();
+    await page.keyboard.press("Shift+Tab");
+    await expect(page.locator("a.language-switch")).toBeFocused();
+    await page.keyboard.press("Shift+Tab");
+    await expect(page.locator(".brand").first()).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(page.locator("a.language-switch")).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(theme).toBeFocused();
+    await page.keyboard.press("Space");
+    await expect(theme).toHaveAttribute("aria-pressed", "true");
+    await expect(theme).toHaveAccessibleName(locale === "ar" ? "التبديل إلى المظهر الفاتح" : "Switch to light theme");
+    const reducedMotion = await page.evaluate(() => ({
+      requested: matchMedia("(prefers-reduced-motion: reduce)").matches,
+      bodyTransition: getComputedStyle(document.body).transitionDuration
+    }));
+    expect(reducedMotion.requested).toBeTruthy();
+    expect(reducedMotion.bodyTransition.split(",").every((duration) => parseFloat(duration) === 0)).toBeTruthy();
+  }
+});
+
+test("Arabic case-study diagrams expose labelled graphic semantics", async ({ page }, info) => {
+  test.skip(!info.project.name.startsWith("mobile"), "Semantic graphic checks run once in the mobile browser project.");
+  for (const item of [
+    { path: "/ar/projects/injaz/", label: "مخطط معماري توضيحي" },
+    { path: "/ar/projects/life-advise/", label: "مخطط تطور توضيحي" }
+  ]) {
+    await page.goto(route(item.path));
+    await expect(page.getByRole("img", { name: item.label })).toBeVisible();
+  }
+});
+
+test("light-theme accent and muted text meet AA over the strongest hero gradient", async ({ page }, info) => {
+  test.skip(!info.project.name.startsWith("mobile"), "Contrast calculation runs once per workflow.");
+  await page.goto(route("/"));
+  await page.locator("html").evaluate((element) => element.setAttribute("data-theme", "light"));
+  const ratios = await page.evaluate(() => {
+    const probe = document.createElement("span");
+    probe.style.color = "var(--blue)";
+    probe.style.backgroundColor = "color-mix(in srgb, var(--blue) 10%, var(--bg))";
+    document.body.append(probe);
+    const rgb = (value: string) => { const channels = value.match(/[\d.]+/g)!.slice(0, 3).map(Number); return Math.max(...channels) <= 1 ? channels.map((channel) => channel * 255) : channels; };
+    const background = rgb(getComputedStyle(probe).backgroundColor);
+    const contrast = (foreground: number[]) => {
+      const linear = (value: number) => {
+        const channel = value / 255;
+        return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+      };
+      const luminance = (rgb: number[]) => {
+        const [r, g, b] = rgb.map(linear);
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      };
+      const values = [luminance(foreground), luminance(background)].sort((a, b) => b - a);
+      return (values[0] + 0.05) / (values[1] + 0.05);
+    };
+    const accent = rgb(getComputedStyle(probe).color);
+    probe.style.color = "var(--muted)";
+    const muted = rgb(getComputedStyle(probe).color);
+    probe.remove();
+    return { accent: contrast(accent), muted: contrast(muted) };
+  });
+  expect(ratios.accent, "Light accent text over the hero gradient").toBeGreaterThanOrEqual(4.5);
+  expect(ratios.muted, "Muted text over the hero gradient").toBeGreaterThanOrEqual(4.5);
+});

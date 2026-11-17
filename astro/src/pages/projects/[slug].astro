@@ -1,0 +1,19 @@
+---
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import INJAZCaseStudy from "../../components/INJAZCaseStudy.astro";
+import LifeAdviseCaseStudy from "../../components/LifeAdviseCaseStudy.astro";
+import { projects } from "../../data/projects";
+export function getStaticPaths(){return projects.map((project)=>({params:{slug:project.slug},props:{project}}));}
+const {project}=Astro.props;
+const injaz=project.slug==="injaz";
+const life=project.slug==="life-advise";
+const hotel=project.slug==="hotel-room-rental";
+const chat=project.slug==="chat-room";
+---
+<SiteLayout title={`${project.name} — Osama Ibrahim`} description={project.description}>
+<section class="page-hero"><div class="container"><a class="read-link" href="/projects/">← All projects</a><small class="eyebrow"> / {project.category}</small><h1>{project.name}</h1><p>{project.description}</p>{!injaz && !life && <div class="case-meta"><span>{project.status}</span>{project.stack.map((item)=><span>{item}</span>)}</div>}{!injaz && !life && <img class="case-image" src={project.image} alt={`${project.name} archive artwork`}/>}</div></section>
+<section class="section"><article class="container simple-content">
+{injaz ? <INJAZCaseStudy/> : life ? <LifeAdviseCaseStudy/> : hotel ? <><small class="eyebrow">PROJECT RECORD / HISTORICAL</small><h2>A room discovery concept for travellers.</h2><p>{project.description}</p><h3>Current evidence</h3><p>The linked source repository identifies a React application. The previously listed public URL did not match the project and is intentionally not offered as a demo.</p><div class="evidence"><b>Evidence status</b><p>Historical project. Source repository retained; deployment destination was not verified as this project.</p></div></> : chat ? <><small class="eyebrow">PROJECT RECORD / HISTORICAL</small><h2>A chat interface built around rooms and conversations.</h2><p>{project.description}</p><p>The linked repository contains the client only. The server, endpoint and end-to-end behaviour are not verified; no server-side technology claims are made.</p><div class="evidence"><b>Evidence status</b><p>Historical client repository. Server-side implementation remains unverified.</p></div></> : <><small class="eyebrow">PROJECT RECORD / HISTORICAL WORK</small><h2>{project.description}</h2><h3>What the archive establishes</h3><p>The surviving source and catalogue record provide limited evidence about the original implementation. A source link is retained where available; it does not establish current runtime compatibility or deployment availability.</p><div class="evidence"><b>Evidence status</b><p>Historical project. Current deployment and runtime compatibility are unverified.</p></div></>}
+{!injaz && !life && <div class="case-links">{project.source && <a class="read-link" href={project.source} target="_blank" rel="noreferrer">Source repository ↗</a>}{project.reference && <a class="read-link" href={project.reference} target="_blank" rel="noreferrer">Previously listed link ↗</a>}</div>}
+</article></section>
+</SiteLayout>

@@ -1,0 +1,22 @@
+{
+  "name": "osama-portfolio",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "check": "astro check",
+    "test:e2e": "playwright test",
+    "preview": "astro preview",
+    "test:preview": "playwright test tests/deployed-preview.spec.ts"
+  },
+  "dependencies": {
+    "astro": "7.4.11"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.12",
+    "@playwright/test": "1.65.0",
+    "typescript": "5.9.3",
+    "@types/node": "22.20.5"
+  }
+}
